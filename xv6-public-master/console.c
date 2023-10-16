@@ -200,8 +200,9 @@ struct Input{
 struct
 {
   /* data */
-  char history[INPUT_HISTORY];
+  struct Input history[INPUT_HISTORY];
   int cur;
+  int end;
 
 } inputs;
 
@@ -252,26 +253,10 @@ static void forwardCursor(){
 
 void
 consputs(const char* s){
-  for(int i = 0; i < INPUT_BUF && (s[i]); ++i){
-    input.buf[input.e++ % INPUT_BUF] = s[i];
+  for(int i = 0; i < INPUT_BUF && s[i] && (s[i] != '\n'); i++){
+    // input.buf[input.e++ % INPUT_BUF] = s[i];
     consputc(s[i]);
   }
-}
-void shiftbuf() {
-    for (int i = input.e; i >= input.e - back_count; i--)
-    {
-        input.buf[i] = input.buf[i - 1]; // Shift elements to the right
-    }
-}
-void bufputc(char c){
-  if(back_count >0){
-      shiftbuf();
-      }
-  input.buf[input.e - back_count - 1% INPUT_BUF] = c;
-  input.e++;
-  
-}
-static void arrowUp(){
 }
 
 void
@@ -282,6 +267,24 @@ consclear(){
     consputc(BACKSPACE);
   }
 }
+
+static void shiftbuf(char* buf){
+  input.e++;
+   for (int i = input.e; i > input.e - 4-1; i--)
+    {
+        buf[(i+1)% INPUT_BUF] = buf[i % INPUT_BUF]; // Shift elements to the right
+    }
+}
+
+// static void bufputc(int c){
+//   if(back_count >0){
+//     shiftbuf(input.buf);
+//     input.buf[(input.e - back_count) % INPUT_BUF] = c;
+//     }
+//   else{
+//     input.buf[input.e++ % INPUT_BUF] = c;
+//   }
+// }
 
 
 void
@@ -314,34 +317,31 @@ consoleintr(int (*getc)(void))
           back_count++;
         break;
       case C('L'):
-        consputc('X');
-        consputc(input.buf[input.e]);
-        consputc('X');
-        consputc(input.buf[input.w]);
-        consputc('X');
-        consputc(input.buf[input.w-1]);
-        consputc('X');
-
+        input = inputs.history[inputs.cur-1];
+        input.buf[input.e] = '\0';
+        consputs(input.buf);
         break;
       case C('F'):
       if(back_count > 0){
         forwardCursor();
         back_count--;
-        arrowUp();
       }
       break;
     default:
       if(c != 0 && input.e-input.r < INPUT_BUF){
         c = (c == '\r') ? '\n' : c;
-        // input.buf[input.e++ % INPUT_BUF] = c;
-        bufputc(c);
+        if(back_count >0){
+          shiftbuf(input.buf);
+          input.buf[(input.e - back_count) % INPUT_BUF] = c;
+        }
+        else{
+          input.buf[input.e++ % INPUT_BUF] = c;
+        }
         consputc(c);
         if(c == '\n' || c == C('D') || input.e == input.r+INPUT_BUF){
+          inputs.history[inputs.cur++] = input;
+          inputs.end = inputs.cur;
           input.w = input.e;
-          // for(int i=0;i<INPUT_BUF;i++){
-          // inputs.history[inputs.cur][i] = input.buf[i];
-          // }
-          inputs.cur++;
           wakeup(&input.r);
         }
       }
@@ -418,4 +418,3 @@ consoleinit(void)
 
   ioapicenable(IRQ_KBD, 0);
 }
-
