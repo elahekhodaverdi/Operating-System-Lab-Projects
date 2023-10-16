@@ -24,6 +24,7 @@ static struct {
   int locking;
 } cons;
 
+int back_count = 0;
 static void
 printint(int xx, int base, int sign)
 {
@@ -128,6 +129,7 @@ panic(char *s)
 #define CRTPORT 0x3d4
 static ushort *crt = (ushort*)P2V(0xb8000);  // CGA memory
 
+
 static void
 cgaputc(int c)
 {
@@ -142,10 +144,18 @@ cgaputc(int c)
   if(c == '\n')
     pos += 80 - pos%80;
   else if(c == BACKSPACE){
+    for (int i = pos - 1 ; i < pos + back_count ; i++)
+      crt[i] = crt[i + 1];
+
     if(pos > 0) --pos;
   } else
-    crt[pos++] = (c&0xff) | 0x0700;  // black on white
+  {
+    for (int i = pos + back_count; i > pos ; i--)
+      crt[i] = crt[i - 1];
 
+    crt[pos] = (c&0xff) | 0x0700;  // black on white
+    pos++;
+  }
   if(pos < 0 || pos > 25*80)
     panic("pos under/overflow");
 
@@ -154,12 +164,12 @@ cgaputc(int c)
     pos -= 80;
     memset(crt+pos, 0, sizeof(crt[0])*(24*80 - pos));
   }
-
   outb(CRTPORT, 14);
   outb(CRTPORT+1, pos>>8);
   outb(CRTPORT, 15);
   outb(CRTPORT+1, pos);
-  crt[pos] = ' ' | 0x0700;
+  crt[pos + back_count] = ' ' | 0x0700;
+  //crt[pos] = ' ' | 0x0700;
 }
 
 void
@@ -177,16 +187,102 @@ consputc(int c)
     uartputc(c);
   cgaputc(c);
 }
+#define INPUT_HISTORY 10
 
 #define INPUT_BUF 128
-struct {
+struct Input{
   char buf[INPUT_BUF];
   uint r;  // Read index
   uint w;  // Write index
   uint e;  // Edit index
 } input;
 
+struct
+{
+  /* data */
+  char history[INPUT_HISTORY];
+  int cur;
+
+} inputs;
+
 #define C(x)  ((x)-'@')  // Control-x
+
+static void backwardCursor(){
+  int pos;
+
+  // get cursor position
+  outb(CRTPORT, 14);
+  pos = inb(CRTPORT+1) << 8;
+  outb(CRTPORT, 15);
+  pos |= inb(CRTPORT+1);
+
+  // move back
+  if(crt[pos - 2] != ('$' | 0x0700))
+    pos--;
+
+  // reset cursor
+  outb(CRTPORT, 14);
+  outb(CRTPORT+1, pos>>8);
+  outb(CRTPORT, 15);
+  outb(CRTPORT+1, pos);
+  //crt[pos] = ' ' | 0x0700;
+}
+
+static void forwardCursor(){
+  int pos;
+
+  // get cursor position
+  outb(CRTPORT, 14);
+  pos = inb(CRTPORT+1) << 8;
+  outb(CRTPORT, 15);
+  pos |= inb(CRTPORT+1);
+
+  // move forward
+  pos++;
+
+  // reset cursor
+  outb(CRTPORT, 14);
+  outb(CRTPORT+1, pos>>8);
+  outb(CRTPORT, 15);
+  outb(CRTPORT+1, pos);
+  //crt[pos] = ' ' | 0x0700;
+}
+
+
+
+void
+consputs(const char* s){
+  for(int i = 0; i < INPUT_BUF && (s[i]); ++i){
+    input.buf[input.e++ % INPUT_BUF] = s[i];
+    consputc(s[i]);
+  }
+}
+void shiftbuf() {
+    for (int i = input.e; i >= input.e - back_count; i--)
+    {
+        input.buf[i] = input.buf[i - 1]; // Shift elements to the right
+    }
+}
+void bufputc(char c){
+  if(back_count >0){
+      shiftbuf();
+      }
+  input.buf[input.e - back_count - 1% INPUT_BUF] = c;
+  input.e++;
+  
+}
+static void arrowUp(){
+}
+
+void
+consclear(){
+  while(input.e !=  input.w &&
+        input.buf[(input.e-1) % INPUT_BUF] != '\n'){
+    input.e--;
+    consputc(BACKSPACE);
+  }
+}
+
 
 void
 consoleintr(int (*getc)(void))
@@ -208,18 +304,44 @@ consoleintr(int (*getc)(void))
       }
       break;
     case C('H'): case '\x7f':  // Backspace
-      if(input.e != input.w){
+      if(input.e != input.w && input.e - input.w > back_count){
         input.e--;
         consputc(BACKSPACE);
+      }
+      break;
+      case C('B'):  // Cursor Backward
+          backwardCursor();
+          back_count++;
+        break;
+      case C('L'):
+        consputc('X');
+        consputc(input.buf[input.e]);
+        consputc('X');
+        consputc(input.buf[input.w]);
+        consputc('X');
+        consputc(input.buf[input.w-1]);
+        consputc('X');
+
+        break;
+      case C('F'):
+      if(back_count > 0){
+        forwardCursor();
+        back_count--;
+        arrowUp();
       }
       break;
     default:
       if(c != 0 && input.e-input.r < INPUT_BUF){
         c = (c == '\r') ? '\n' : c;
-        input.buf[input.e++ % INPUT_BUF] = c;
+        // input.buf[input.e++ % INPUT_BUF] = c;
+        bufputc(c);
         consputc(c);
         if(c == '\n' || c == C('D') || input.e == input.r+INPUT_BUF){
           input.w = input.e;
+          // for(int i=0;i<INPUT_BUF;i++){
+          // inputs.history[inputs.cur][i] = input.buf[i];
+          // }
+          inputs.cur++;
           wakeup(&input.r);
         }
       }
