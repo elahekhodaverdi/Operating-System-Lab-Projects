@@ -310,9 +310,9 @@ static void arrowup()
 {
   if (((inputs.cur - inputs.end) % INPUT_HISTORY) != 1)
   {
-    if(inputs.cur == inputs.end){
-      inputs.history[inputs.end % INPUT_HISTORY] = input;
-    }
+    // if(inputs.cur == inputs.end){
+    //   inputs.history[inputs.end % INPUT_HISTORY] = input;
+    // }
     displayclear();
     input = inputs.history[--inputs.cur % INPUT_HISTORY];
     input.buf[--input.e] = '\0';
@@ -322,7 +322,7 @@ static void arrowup()
 
 static void arrowdown()
 {
-  if (((inputs.cur - inputs.end) % INPUT_HISTORY) != 1)
+  if (((inputs.cur - inputs.end) % INPUT_HISTORY) != 1 && inputs.cur < inputs.end)
   {
     displayclear();
     input = inputs.history[++inputs.cur % INPUT_HISTORY];
@@ -331,8 +331,9 @@ static void arrowdown()
   }
 }
 
-static void clearscreen(){
-    int pos;
+static void clearscreen()
+{
+  int pos;
 
   // get cursor position
   outb(CRTPORT, 14);
@@ -340,15 +341,15 @@ static void clearscreen(){
   outb(CRTPORT, 15);
   pos |= inb(CRTPORT + 1);
 
-
-  while(pos){
+  while (pos)
+  {
     consputc(BACKSPACE);
     pos--;
   }
   input.e = input.w = input.r = 0;
   consputc('$');
   consputc(' ');
-  pos +=2;
+  pos += 2;
   // reset cursor
   outb(CRTPORT, 14);
   outb(CRTPORT + 1, pos >> 8);
@@ -400,36 +401,45 @@ void consoleintr(int (*getc)(void))
       }
       break;
     case C('L'):
-    clearscreen();
-    break;
+      clearscreen();
+      break;
     case C('Z'):
-    if(inputs.size && inputs.end - inputs.cur < inputs.size){
-      arrowup();}
+      if (inputs.size && inputs.end - inputs.cur < inputs.size)
+      {
+        arrowup();
+      }
       break;
     case C('V'):
-    if(inputs.size && inputs.end - inputs.cur >0){
-      arrowdown();}
+      if (inputs.size && inputs.end - inputs.cur > 0)
+      {
+        arrowdown();
+      }
       break;
     default:
       if (c != 0 && input.e - input.r < INPUT_BUF)
       {
         c = (c == '\r') ? '\n' : c;
-        if (back_count > 0 && c != '\n')
-        {
-          shiftright(input.buf);
-          input.buf[(input.e++ - back_count) % INPUT_BUF] = c;
-        }
-        else
-        {
-          input.buf[input.e++ % INPUT_BUF] = c;
-        }
+        // if (back_count > 0 && c != '\n')
+        // {
+        //   shiftright(input.buf);
+        //   input.buf[(input.e++ - back_count) % INPUT_BUF] = c;
+        // }
+        // else
+        // {
+        //   input.buf[input.e++ % INPUT_BUF] = c;
+        // }
+        if (c == '\n')
+          back_count = 0;
+
+        shiftright(input.buf);
+        input.buf[(input.e++ - back_count) % INPUT_BUF] = c;
         consputc(c);
         if (c == '\n' || c == C('D') || input.e == input.r + INPUT_BUF)
         {
           inputs.history[inputs.end++ % INPUT_HISTORY] = input;
           inputs.cur = inputs.end;
-          back_count = 0;
-          if(inputs.size < 10)  inputs.size++;
+          if (inputs.size < 10)
+            inputs.size++;
           input.w = input.e;
           wakeup(&input.r);
         }
