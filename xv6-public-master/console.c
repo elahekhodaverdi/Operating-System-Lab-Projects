@@ -253,8 +253,8 @@ static void forwardCursor(){
 
 void
 consputs(const char* s){
-  for(int i = 0; i < INPUT_BUF && s[i] && (s[i] != '\n'); i++){
-    // input.buf[input.e++ % INPUT_BUF] = s[i];
+  for(int i = 0; i < INPUT_BUF && s[i] && s[i]; i++){
+    input.buf[input.e++ % INPUT_BUF] = s[i];
     consputc(s[i]);
   }
 }
@@ -268,11 +268,13 @@ consclear(){
   }
 }
 
+
+
 static void shiftbuf(char* buf){
-  input.e++;
-   for (int i = input.e; i > input.e - 4-1; i--)
+  //input.e++;
+   for (int i = input.e; i > input.e - back_count; i--)
     {
-        buf[(i+1)% INPUT_BUF] = buf[i % INPUT_BUF]; // Shift elements to the right
+        buf[(i)% INPUT_BUF] = buf[(i-1) % INPUT_BUF]; // Shift elements to the right
     }
 }
 
@@ -317,9 +319,20 @@ consoleintr(int (*getc)(void))
           back_count++;
         break;
       case C('L'):
-        input = inputs.history[inputs.cur-1];
-        input.buf[input.e] = '\0';
+      if((((inputs.cur  % INPUT_HISTORY) - 1) % INPUT_HISTORY) != (inputs.end % INPUT_HISTORY)){
+        input = inputs.history[--inputs.cur % INPUT_HISTORY];
+        input.buf[--input.e] = '\0';
+        consclear();
         consputs(input.buf);
+      }
+        break;
+      case C('Q'):
+      if(inputs.cur < inputs.end){
+        input = inputs.history[++inputs.cur  % INPUT_HISTORY];
+        input.buf[--input.e] = '\0';
+        consclear();
+        consputs(input.buf);
+      }
         break;
       case C('F'):
       if(back_count > 0){
@@ -327,20 +340,22 @@ consoleintr(int (*getc)(void))
         back_count--;
       }
       break;
+      case C('W'):
+      break;
     default:
       if(c != 0 && input.e-input.r < INPUT_BUF){
         c = (c == '\r') ? '\n' : c;
-        if(back_count >0){
+        if(back_count >0 && c != '\n'){
           shiftbuf(input.buf);
-          input.buf[(input.e - back_count) % INPUT_BUF] = c;
+          input.buf[(input.e++ - back_count) % INPUT_BUF] = c;
         }
         else{
           input.buf[input.e++ % INPUT_BUF] = c;
         }
         consputc(c);
         if(c == '\n' || c == C('D') || input.e == input.r+INPUT_BUF){
-          inputs.history[inputs.cur++] = input;
-          inputs.end = inputs.cur;
+          inputs.history[inputs.end++ % INPUT_HISTORY] = input;
+          inputs.cur = inputs.end;
           input.w = input.e;
           wakeup(&input.r);
         }
