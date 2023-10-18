@@ -175,7 +175,6 @@ cgaputc(int c)
   outb(CRTPORT, 15);
   outb(CRTPORT + 1, pos);
   crt[pos + back_count] = ' ' | 0x0700;
-  // crt[pos] = ' ' | 0x0700;
 }
 
 void consputc(int c)
@@ -205,7 +204,7 @@ struct Input
   char buf[INPUT_BUF];
   uint r; // Read index
   uint w; // Write index
-  uint e; // Edit index
+  uint e; // End index
 } input;
 
 struct
@@ -238,7 +237,6 @@ static void backwardCursor()
   outb(CRTPORT + 1, pos >> 8);
   outb(CRTPORT, 15);
   outb(CRTPORT + 1, pos);
-  // crt[pos] = ' ' | 0x0700;
 }
 
 static void forwardCursor()
@@ -259,7 +257,6 @@ static void forwardCursor()
   outb(CRTPORT + 1, pos >> 8);
   outb(CRTPORT, 15);
   outb(CRTPORT + 1, pos);
-  // crt[pos] = ' ' | 0x0700;
 }
 
 void displaylastcommand()
