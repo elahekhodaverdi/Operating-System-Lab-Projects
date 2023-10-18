@@ -367,15 +367,10 @@ void consoleintr(int (*getc)(void))
       back_count = 0;
       break;
     case C('U'): // Kill line.
-      for (int i = 0; i < back_count; i++)
-        forwardCursor();
-      back_count = 0;
+      displayclear();
       while (input.e != input.w &&
              input.buf[(input.e - 1) % INPUT_BUF] != '\n')
-      {
         input.e--;
-        consputc(BACKSPACE);
-      }
       break;
     case C('H'):
     case '\x7f': // Backspace
