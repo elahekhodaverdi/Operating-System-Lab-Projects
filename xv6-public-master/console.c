@@ -272,6 +272,11 @@ void displaylastcommand()
 
 void displayclear()
 {
+  for (int i = 0; i < back_count; i++)
+  {
+    forwardCursor();
+  }
+  back_count = 0;
   int end = input.e;
   while (end != input.w &&
          input.buf[(end - 1) % INPUT_BUF] != '\n')
@@ -359,8 +364,12 @@ void consoleintr(int (*getc)(void))
     case C('P'): // Process listing.
       // procdump() locks cons.lock indirectly; invoke later
       doprocdump = 1;
+      back_count = 0;
       break;
     case C('U'): // Kill line.
+      for (int i = 0; i < back_count; i++)
+        forwardCursor();
+      back_count = 0;
       while (input.e != input.w &&
              input.buf[(input.e - 1) % INPUT_BUF] != '\n')
       {
@@ -395,18 +404,15 @@ void consoleintr(int (*getc)(void))
     case C('L'):
       clearscreen();
       inputs.cur = inputs.end;
+      back_count = 0;
       break;
     case C('Z'):
       if (inputs.size && inputs.end - inputs.cur < inputs.size)
-      {
         arrowup();
-      }
       break;
     case C('V'):
       if (inputs.size && inputs.end - inputs.cur > 0)
-      {
         arrowdown();
-      }
       break;
     default:
       if (c != 0 && input.e - input.r < INPUT_BUF)
