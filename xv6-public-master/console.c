@@ -197,7 +197,7 @@ void consputc(int c)
     uartputc(c);
   cgaputc(c);
 }
-#define INPUT_HISTORY 10
+#define INPUT_HISTORY 11
 
 #define INPUT_BUF 128
 struct Input
@@ -211,7 +211,7 @@ struct Input
 struct
 {
   /* data */
-  struct Input history[INPUT_HISTORY + 1];
+  struct Input history[INPUT_HISTORY];
   int cur;
   int end;
   int size;
@@ -262,14 +262,6 @@ static void forwardCursor()
   // crt[pos] = ' ' | 0x0700;
 }
 
-void consputs(const char *s)
-{
-  for (int i = 0; i < INPUT_BUF && s[i]; i++)
-  {
-    // input.buf[input.e++ % INPUT_BUF] = s[i];
-    consputc(s[i]);
-  }
-}
 void displaylastcommand()
 {
   for (int i = (input.w); i < input.e; i++)
@@ -308,25 +300,25 @@ static void shiftleft(char *buf)
 
 static void arrowup()
 {
-  if (((inputs.cur - inputs.end) % INPUT_HISTORY) != 1)
+
+  if (inputs.cur == inputs.end)
   {
-    // if(inputs.cur == inputs.end){
-    //   inputs.history[inputs.end % INPUT_HISTORY] = input;
-    // }
-    displayclear();
-    input = inputs.history[--inputs.cur % INPUT_HISTORY];
-    input.buf[--input.e] = '\0';
-    displaylastcommand();
+    inputs.history[inputs.end % INPUT_HISTORY] = input;
   }
+  displayclear();
+  input = inputs.history[--inputs.cur % INPUT_HISTORY];
+  input.buf[--input.e] = '\0';
+  displaylastcommand();
 }
 
 static void arrowdown()
 {
-  if (((inputs.cur - inputs.end) % INPUT_HISTORY) != 1 && inputs.cur < inputs.end)
+  if (inputs.cur < inputs.end)
   {
     displayclear();
     input = inputs.history[++inputs.cur % INPUT_HISTORY];
-    input.buf[--input.e] = '\0';
+    if (input.e != input.w && inputs.cur != inputs.end)
+      input.buf[--input.e] = '\0';
     displaylastcommand();
   }
 }
@@ -402,6 +394,7 @@ void consoleintr(int (*getc)(void))
       break;
     case C('L'):
       clearscreen();
+      inputs.cur = inputs.end;
       break;
     case C('Z'):
       if (inputs.size && inputs.end - inputs.cur < inputs.size)
@@ -419,15 +412,7 @@ void consoleintr(int (*getc)(void))
       if (c != 0 && input.e - input.r < INPUT_BUF)
       {
         c = (c == '\r') ? '\n' : c;
-        // if (back_count > 0 && c != '\n')
-        // {
-        //   shiftright(input.buf);
-        //   input.buf[(input.e++ - back_count) % INPUT_BUF] = c;
-        // }
-        // else
-        // {
-        //   input.buf[input.e++ % INPUT_BUF] = c;
-        // }
+
         if (c == '\n')
           back_count = 0;
 
