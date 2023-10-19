@@ -398,11 +398,11 @@ void consoleintr(int (*getc)(void))
       inputs.cur = inputs.end;
       back_count = 0;
       break;
-    case C('Z'):
+    case 226:
       if (inputs.size && inputs.end - inputs.cur < inputs.size)
         arrowup();
       break;
-    case C('V'):
+    case 227:
       if (inputs.size && inputs.end - inputs.cur > 0)
         arrowdown();
       break;
