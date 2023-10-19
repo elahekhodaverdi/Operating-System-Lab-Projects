@@ -22,52 +22,30 @@ void StrDiffCalculate(const char *word1, const char *word2, char *result) {
             }
         }
     }
-    result[max_length] = '\0';
+    result[max_length] = '\n';
 }
 
 int main(int argc, char *argv[]) {
     char *word1, *word2, result[16];
-    int fd, nbytes;
+    int fd;
 
     if (argc != 3) {
         printf(1, "strdiff: 2 words required\n");
         exit();
     }
-
     word1 = argv[1];
     word2 = argv[2];
 
     StrDiffCalculate(word1, word2, result);
-
-    
-    fd = open("output.txt", O_CREATE | O_RDWR);
+    fd = open("strdiff_result.txt", O_CREATE | O_RDWR);
 
     if (fd < 0) {
         printf(1, "Can't create or open the file\n");
         exit();
     }
-
     write(fd, result, strlen(result));
-
-    
     close(fd);
-
-    fd = open("output.txt", O_RDONLY);
-
-    if (fd < 0) {
-        printf(1, "Can't open the file for reading\n");
-        exit();
-    }
-
-    nbytes = read(fd, result, sizeof(result));
-    if (nbytes > 0) {
-        result[nbytes]='\0';
-        printf(1,result);
-        printf(1,"\n");
-    }
-
- 
-    close(fd);
-
     exit();
 }
+
+
