@@ -237,6 +237,7 @@ static void backwardCursor()
   outb(CRTPORT + 1, pos >> 8);
   outb(CRTPORT, 15);
   outb(CRTPORT + 1, pos);
+  back_count++;
 }
 
 static void forwardCursor()
@@ -257,6 +258,7 @@ static void forwardCursor()
   outb(CRTPORT + 1, pos >> 8);
   outb(CRTPORT, 15);
   outb(CRTPORT + 1, pos);
+  back_count--;
 }
 
 void displaylastcommand()
@@ -270,9 +272,7 @@ void displaylastcommand()
 void displayclear()
 {
   for (int i = 0; i < back_count; i++)
-  {
     forwardCursor();
-  }
   back_count = 0;
   int end = input.e;
   while (end != input.w &&
@@ -327,6 +327,9 @@ static void arrowdown()
 
 static void clearscreen()
 {
+  for (int i = 0; i < back_count; i++)
+    forwardCursor();
+  back_count = 0;
   int pos;
 
   // get cursor position
@@ -379,24 +382,17 @@ void consoleintr(int (*getc)(void))
         consputc(BACKSPACE);
       }
       break;
-    case C('B'): // Cursor Backward
+    case C('B'):
       if ((input.e - back_count) > input.w)
-      {
         backwardCursor();
-        back_count++;
-      }
       break;
     case C('F'):
       if (back_count > 0)
-      {
         forwardCursor();
-        back_count--;
-      }
       break;
     case C('L'):
       clearscreen();
       inputs.cur = inputs.end;
-      back_count = 0;
       break;
     case 226:
       if (inputs.size && inputs.end - inputs.cur < inputs.size)
