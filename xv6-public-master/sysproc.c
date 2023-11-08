@@ -89,3 +89,10 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+int sys_find_digital_root(void)
+{
+  int number = myproc()->tf->ebx;
+  cprintf("KERNEL: sys_find_digital_root() is called for n = %d\n", number);
+  return find_digital_root(number);
+}
