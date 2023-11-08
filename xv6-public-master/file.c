@@ -155,3 +155,6 @@ filewrite(struct file *f, char *addr, int n)
   panic("filewrite");
 }
 
+int copyfile(struct file* src, struct file* dst){
+  
+}

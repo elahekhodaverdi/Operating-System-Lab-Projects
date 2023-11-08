@@ -442,3 +442,14 @@ sys_pipe(void)
   fd[1] = fd1;
   return 0;
 }
+
+int
+sys_copy_file(void){
+  char* path_src;
+  char* path_des;
+  if(argstr(0,&path_src) < 0 || argstr(1,&path_des) < 0)
+    return -1;
+  
+  
+
+}
