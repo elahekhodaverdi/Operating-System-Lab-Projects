@@ -156,5 +156,39 @@ filewrite(struct file *f, char *addr, int n)
 }
 
 int copyfile(struct file* src, struct file* dst){
-  
+  int r;
+  char* buf;
+  if(src->readable == 0 || dst->writable == 0)
+    return -1;
+  if (src->type == FD_INODE && dst->type == FD_INODE){
+    
+    begin_op();
+    ilock(src->ip);
+    ilock(dst->ip);
+
+    while(r = readi(src->ip,buf,src->off,100) > 0){
+      src->off += r;
+    }
+
+    int max = ((MAXOPBLOCKS-1-1-2) / 2) * 512;
+    int i = 0;
+    while(i < src->off){
+      int n1 = src->off - i;
+      if(n1 > max)
+        n1 = max;
+      if ((r = writei(dst->ip, buf + i, dst->off, n1)) > 0)
+        dst->off += r;
+      if(r < 0)
+        break;
+      if(r != n1)
+        panic("short filewrite");
+      i += r;
+    }
+
+    iunlock(src->ip);
+    iunlock(dst->ip);
+    end_op();
+    return i == src->off ? src->off : -1;
+  }
+  panic("copyfile");
 }
