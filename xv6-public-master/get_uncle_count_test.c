@@ -11,13 +11,11 @@ int main() {
     if (child1 == 0) {
         printf(1, "Child 1 forked successfully (PID: %d)\n", getpid());
         sleep(100);
-        printf(1, "child 1 is out of sleep")
         grandchild = fork();
         if (grandchild == 0) {
-            
             printf(1, "Grandchild process forked successfully (PID: %d)\n", getpid());
             int uncle_count = get_uncle_count();
-            printf(1, "Uncle count: %d\n", uncleCount);
+            printf(1, "Uncle count: %d\n", uncle_count);
             exit();
         }
         wait();
