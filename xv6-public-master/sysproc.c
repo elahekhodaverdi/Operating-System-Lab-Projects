@@ -102,5 +102,5 @@ int
 sys_get_uncle_count(void)
 {
   int child_count = get_child_count();
-  return chilsc-1;
+  return child_count-1;
 }
