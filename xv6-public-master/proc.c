@@ -533,6 +533,19 @@ procdump(void)
   }
 }
 
+int 
+find_digital_root(int n) {
+    while (n >= 10) {
+        int sum = 0;
+        while (n > 0) {
+            sum += n % 10;
+            n /= 10;
+        }
+        n = sum;
+    }
+    return n;
+}
+
 int get_child_count(void){
   struct proc* curr = myproc();
   struct proc* grand_parent = curr->parent->parent;
