@@ -182,9 +182,8 @@ UPROGS=\
 	_wc\
 	_zombie\
 	_digital_root\
-	-pid\
-	-get_uncle_count\
-	-get_uncle_count_test\
+	_pid\
+	_get_uncle_count_test\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
