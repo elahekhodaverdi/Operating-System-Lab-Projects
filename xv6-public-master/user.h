@@ -25,6 +25,7 @@ int sleep(int);
 int uptime(void);
 int find_digital_root(void);
 int get_uncle_count(void);
+int copy_file(char* , char*);
 
 // ulib.c
 int stat(const char*, struct stat*);
@@ -39,5 +40,3 @@ void* memset(void*, int, uint);
 void* malloc(uint);
 void free(void*);
 int atoi(const char*);
-
-int copy_file(char* , char*);

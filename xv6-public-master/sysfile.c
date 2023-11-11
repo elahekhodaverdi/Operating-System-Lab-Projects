@@ -456,6 +456,7 @@ int sys_pipe(void)
   return 0;
 }
 
+
 int sys_copy_file(void)
 {
   char *path_src;
@@ -468,13 +469,14 @@ int sys_copy_file(void)
     return -1;
 
   begin_op();
-  ip_src = create(path_src, T_FILE, 0, 0);
+  ip_src = namei(path_src);
   ip_des = create(path_des, T_FILE, 0, 0);
-  if (ip_src == 0 || ip_des == 0)
+  if (ip_src == 0 || ip_des == 0 || (ip_src->type != T_FILE) || (ip_src == ip_des))
   {
     end_op();
     return -1;
   }
+  ilock(ip_src);
 
   if ((f_src = filealloc()) == 0 || (f_des = filealloc()) == 0)
   {
@@ -483,10 +485,9 @@ int sys_copy_file(void)
     end_op();
     return -1;
   }
-  iunlock(ip_src);
   iunlock(ip_des);
+  iunlock(ip_src);
   end_op();
-
   f_src->type = FD_INODE;
   f_src->ip = ip_src;
   f_src->off = 0;
@@ -498,6 +499,6 @@ int sys_copy_file(void)
   f_des->writable = 1;
   int r = copyfile(f_src, f_des);
   fileclose(f_src);
-  fileclose(f)_des;
+  fileclose(f_des);
   return r;
 }

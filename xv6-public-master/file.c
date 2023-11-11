@@ -155,40 +155,32 @@ filewrite(struct file *f, char *addr, int n)
   panic("filewrite");
 }
 
-int copyfile(struct file* src, struct file* dst){
-  int r;
-  char* buf;
-  if(src->readable == 0 || dst->writable == 0)
+int copyfile(struct file *src, struct file *dst)
+{
+  int r1, r2;
+  if (src->readable == 0 || dst->writable == 0)
     return -1;
-  if (src->type == FD_INODE && dst->type == FD_INODE){
-    
+  if (src->type == FD_INODE && dst->type == FD_INODE)
+  {
     begin_op();
     ilock(src->ip);
     ilock(dst->ip);
 
-    while(r = readi(src->ip,buf,src->off,100) > 0){
-      src->off += r;
-    }
-
-    int max = ((MAXOPBLOCKS-1-1-2) / 2) * 512;
-    int i = 0;
-    while(i < src->off){
-      int n1 = src->off - i;
-      if(n1 > max)
-        n1 = max;
-      if ((r = writei(dst->ip, buf + i, dst->off, n1)) > 0)
-        dst->off += r;
-      if(r < 0)
+    char buf[256];
+    while ((r1 = readi(src->ip, buf, src->off, 256)) > 0)
+    {
+      src->off += r1;
+      if ((r2 = writei(dst->ip, buf, dst->off, r1)) > 0)
+        dst->off += r2;
+      if (r2 < 0)
         break;
-      if(r != n1)
+      if (r2 != r1)
         panic("short filewrite");
-      i += r;
     }
-
     iunlock(src->ip);
     iunlock(dst->ip);
     end_op();
-    return i == src->off ? src->off : -1;
+    return dst->off == src->off ? 0 : -1;
   }
   panic("copyfile");
 }
