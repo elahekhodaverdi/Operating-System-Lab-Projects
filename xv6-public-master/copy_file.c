@@ -13,6 +13,6 @@ int main(int argc, char * argv[]){
         printf(1,"copy_file: cannot copy the file\n");
         exit();
     }
-    printf(1,"done\n");
+    printf(1,"%s has been copied to %s\n", src, des);
     exit();
 }
