@@ -101,13 +101,13 @@ int sys_find_digital_root(void)
 int
 sys_get_uncle_count(void)
 {
-  struct proc* curr = myproc();
-  struct proc* grand_parent = curr->parent->parent;
-  int child_count = 0;
+  // struct proc* curr = myproc();
+  // struct proc* grand_parent = curr->parent->parent;
+  // int child_count = 0;
 
-   for (struct proc* p = proc; p < &proc[NPROC]; p++) {
-    if (p->parent == grand_parent) {
-      child_count++;
-    }
-   }
+  //  for (struct proc* p = proc; p < &proc[NPROC]; p++) {
+  //   if (p->parent == grand_parent) {
+  //     child_count++;
+  //   }
+  //  }
 }

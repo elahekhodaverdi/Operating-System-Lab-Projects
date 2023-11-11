@@ -105,7 +105,7 @@ extern int sys_write(void);
 extern int sys_uptime(void);
 extern int sys_find_digital_root(void);
 extern int sys_copy_file(void);
-extern int get_uncle_count(void);
+extern int sys_get_uncle_count(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
