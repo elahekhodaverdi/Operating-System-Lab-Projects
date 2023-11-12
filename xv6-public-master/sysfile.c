@@ -470,13 +470,14 @@ int sys_copy_file(void)
 
   begin_op();
   ip_src = namei(path_src);
-  ip_des = create(path_des, T_FILE, 0, 0);
-  if (ip_src == 0 || ip_des == 0 || (ip_src->type != T_FILE) || (ip_src == ip_des))
+  ip_des = namei(path_des);
+  if (ip_src == 0 || ip_des != 0 || (ip_src->type != T_FILE) || (ip_src == ip_des))
   {
     end_op();
     return -1;
   }
   ilock(ip_src);
+  ip_des = create(path_des, T_FILE, 0, 0);
 
   if ((f_src = filealloc()) == 0 || (f_des = filealloc()) == 0)
   {
