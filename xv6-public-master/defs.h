@@ -122,6 +122,7 @@ void            wakeup(void*);
 void            yield(void);
 int             find_digital_root(int);
 int             get_child_count(void);
+int             get_process_lifetime(void);
 
 // swtch.S
 void            swtch(struct context**, struct context*);
