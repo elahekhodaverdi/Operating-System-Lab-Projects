@@ -26,6 +26,7 @@ int uptime(void);
 int find_digital_root(void);
 int get_uncle_count(void);
 int copy_file(char* , char*);
+int get_process_lifetime(void);
 
 // ulib.c
 int stat(const char*, struct stat*);
