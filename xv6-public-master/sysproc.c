@@ -104,3 +104,7 @@ sys_get_uncle_count(void)
   int child_count = get_child_count();
   return child_count-1;
 }
+
+int sys_get_process_lifetime(void) {
+  return get_process_lifetime();
+}
