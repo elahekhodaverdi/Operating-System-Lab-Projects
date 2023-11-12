@@ -211,7 +211,7 @@ fork(void)
   safestrcpy(np->name, curproc->name, sizeof(curproc->name));
 
   pid = np->pid;
-
+  np->creation_time=ticks;
   acquire(&ptable.lock);
 
   np->state = RUNNABLE;
@@ -557,4 +557,9 @@ int get_child_count(void){
    }
    return child_count;
 
+}
+
+int 
+get_process_lifetime(void) {
+  return (sys_uptime() - myproc()->creation_time);
 }
