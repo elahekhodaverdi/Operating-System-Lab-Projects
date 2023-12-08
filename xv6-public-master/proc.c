@@ -322,7 +322,7 @@ wait(void)
 
 
 struct proc*
-LCFS(void)
+lcfs(void)
 {
   struct proc* result = 0;
 
@@ -349,7 +349,7 @@ scheduler(void)
   struct cpu *c = mycpu();
   c->proc = 0;
   srand(ticks);
-  
+
   for(;;){
     // Enable interrupts on this processor.
     sti();
