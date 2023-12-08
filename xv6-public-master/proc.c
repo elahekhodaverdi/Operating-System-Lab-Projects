@@ -343,6 +343,25 @@ lcfs(void)
   return result;
 }
 
+
+struct proc*
+roundrobin(struct proc *lastScheduled)
+{
+  struct proc *p = lastScheduled;
+  for (;;)
+  {
+    p++;
+    if (p >= &ptable.proc[NPROC])
+      p = ptable.proc;
+
+    if (p->state == RUNNABLE && p->sched_info.queue == ROUND_ROBIN)
+      return p;
+
+    if (p == lastScheduled)
+      return 0;
+  }
+}
+
 void
 scheduler(void)
 {
