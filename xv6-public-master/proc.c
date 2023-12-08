@@ -389,7 +389,7 @@ roundrobin(struct proc *lastScheduled)
   }
 }
 
-float get_rank(struct proc *p)
+float bjfrank(struct proc *p)
 {
   return p->sched_info.bjf.priority * p->sched_info.bjf.priority_ratio +
          p->sched_info.bjf.arrival_time * p->sched_info.bjf.arrival_time_ratio +
@@ -408,7 +408,7 @@ bestjobfirst(void)
   {
     if (p->state != RUNNABLE || p->sched_info.queue != BJF)
       continue;
-    float p_rank = get_rank(p);
+    float p_rank = bjfrank(p);
     if (p_rank < min_rank)
     {
       min_p = p;
