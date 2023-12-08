@@ -112,6 +112,8 @@ found:
   memset(p->context, 0, sizeof *p->context);
   p->context->eip = (uint)forkret;
 
+  /// initial new variable : elahe
+
   return p;
 }
 
@@ -216,6 +218,8 @@ fork(void)
   acquire(&ptable.lock);
 
   np->state = RUNNABLE;
+
+  /// initial ticks related variables : elahe
 
   release(&ptable.lock);
   change_queue(np->pid, UNSET);
@@ -398,8 +402,10 @@ scheduler(void)
     switchuvm(p);
     p->state = RUNNING;
 
+  // initial some ticks related variable again  elahe
     swtch(&(c->scheduler), p->context);
     switchkvm();
+
 
     // Process is done running for now.
     // It should have changed its p->state before coming back.
@@ -639,6 +645,8 @@ change_queue(int pid, int new_queue) {
     if(p->pid == pid){
       old_queue = p->sched_info.queue;
       p->sched_info.queue = new_queue;
+
+      // check if we need to aquire tickslock or not
       p->sched_info.arrival_queue_time = ticks;
       if (new_queue == ROUND_ROBIN) {
 
