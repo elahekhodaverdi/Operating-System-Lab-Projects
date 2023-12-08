@@ -151,6 +151,7 @@ userinit(void)
   p->state = RUNNABLE;
 
   release(&ptable.lock);
+  change_queue(p->pid, UNSET);
 }
 
 // Grow current process's memory by n bytes.
@@ -217,6 +218,7 @@ fork(void)
   np->state = RUNNABLE;
 
   release(&ptable.lock);
+  change_queue(np->pid, UNSET);
 
   return pid;
 }
