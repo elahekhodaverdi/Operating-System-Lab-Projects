@@ -109,6 +109,8 @@ extern int sys_get_uncle_count(void);
 extern int sys_get_process_lifetime(void);
 extern int sys_change_scheduling_queue(void);
 extern int sys_print_processes_info(void);
+extern int sys_set_proc_bjf_params(void);
+extern int sys_set_system_bjf_params(void);
 
 
 static int (*syscalls[])(void) = {
@@ -138,7 +140,9 @@ static int (*syscalls[])(void) = {
 [SYS_get_uncle_count] sys_get_uncle_count,
 [SYS_get_process_lifetime] sys_get_process_lifetime,
 [SYS_change_scheduling_queue]   sys_change_scheduling_queue,
-[SYS_print_processes_info] sys_print_processes_info
+[SYS_print_processes_info] sys_print_processes_info,
+[SYS_set_proc_bjf_params]    sys_set_proc_bjf_params,
+[SYS_set_system_bjf_params]     sys_set_system_bjf_params,
 };
 
 void

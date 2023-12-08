@@ -127,6 +127,8 @@ int             get_child_count(void);
 int             get_process_lifetime(void);
 int             change_queue(int, int);
 void            print_processes_info(void);
+int             set_proc_bjf_params(int, float, float, float,float);
+int             set_system_bjf_params(float, float, float,float);
 
 // swtch.S
 void            swtch(struct context**, struct context*);

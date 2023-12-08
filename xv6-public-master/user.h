@@ -28,6 +28,8 @@ int get_uncle_count(void);
 int copy_file(char* , char*);
 int get_process_lifetime(void);
 int change_scheduling_queue(int, int);
+int set_proc_bjf_params(int,float,float,float,float);
+int set_system_bjf_params(float,float,float,float);
 
 // ulib.c
 int stat(const char*, struct stat*);
