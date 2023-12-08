@@ -322,7 +322,6 @@ wait(void)
 //  - eventually that process transfers control
 //      via swtch back to the scheduler.
 
-
 struct proc*
 lcfs(void)
 {
@@ -334,7 +333,7 @@ lcfs(void)
     if(p->state != RUNNABLE || p->sched_info.queue != LCFS)
       continue;
     if(result != 0){
-      if(result->sched_info.lcfs.arrival_time < p->sched_info.lcfs.arrival_time)
+      if(result->sched_info.arrival_queue_time < p->sched_info.arrival_queue_time)
         result = p;
     }
     else
@@ -691,3 +690,69 @@ ageprocs(int os_ticks)
   release(&ptable.lock);
 }
 
+
+void 
+print_processes_info(){
+
+  static char *states[] = {
+  [UNUSED]    "unused",
+  [EMBRYO]    "embryo",
+  [SLEEPING]  "sleeping",
+  [RUNNABLE]  "runnable",
+  [RUNNING]   "running",
+  [ZOMBIE]    "zombie"
+  };
+  
+  static int columns[] = {16, 8, 9, 8, 8, 8, 9, 8, 8, 8, 8};
+  cprintf("Process_Name    PID     State    Queue   Cycle   Arrival Priority R_Prty  R_Arvl  R_Exec  R_Size  Rank\n"
+          "------------------------------------------------------------------------------------------------------\n");
+
+  struct proc *p;
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    if(p->state == UNUSED)
+      continue;
+
+    const char* state;
+    if(p->state >= 0 && p->state < NELEM(states) && states[p->state])
+      state = states[p->state];
+    else
+      state = "???";
+
+    cprintf("%s", p->name);
+    printspaces(columns[0] - strlen(p->name));
+
+    cprintf("%d", p->pid);
+    printspaces(columns[1] - digitcount(p->pid));
+
+    cprintf("%s", state);
+    printspaces(columns[2] - strlen(state));
+
+    cprintf("%d", p->sched_info.queue);
+    printspaces(columns[3] - digitcount(p->sched_info.queue));
+
+    cprintf("%d", (int)p->sched_info.bjf.executed_cycle);
+    printspaces(columns[4] - digitcount((int)p->sched_info.bjf.executed_cycle));
+
+    cprintf("%d", p->sched_info.bjf.arrival_time);
+    printspaces(columns[5] - digitcount(p->sched_info.bjf.arrival_time));
+
+    cprintf("%d", p->sched_info.bjf.priority);
+    printspaces(columns[6] - digitcount(p->sched_info.bjf.priority));
+
+    cprintf("%d", (int)p->sched_info.bjf.priority_ratio);
+    printspaces(columns[7] - digitcount((int)p->sched_info.bjf.priority_ratio));
+
+    cprintf("%d", (int)p->sched_info.bjf.arrival_time_ratio);
+    printspaces(columns[8] - digitcount((int)p->sched_info.bjf.arrival_time_ratio));
+
+    cprintf("%d", (int)p->sched_info.bjf.executed_cycle_ratio);
+    printspaces(columns[9] - digitcount((int)p->sched_info.bjf.executed_cycle_ratio));
+
+    cprintf("%d", (int)p->sched_info.bjf.process_size_ratio);
+    printspaces(columns[10] - digitcount((int)p->sched_info.bjf.process_size_ratio));
+
+    cprintf("%d", (int)bjfrank(p));
+    cprintf("\n");
+  }
+
+}

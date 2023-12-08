@@ -21,6 +21,7 @@ void            consoleinit(void);
 void            cprintf(char*, ...);
 void            consoleintr(int(*)(void));
 void            panic(char*) __attribute__((noreturn));
+void            printspaces(int count);
 
 // exec.c
 int             exec(char*, char**);
@@ -125,6 +126,7 @@ int             find_digital_root(int);
 int             get_child_count(void);
 int             get_process_lifetime(void);
 int             change_queue(int, int);
+void            print_processes_info(void);
 
 // swtch.S
 void            swtch(struct context**, struct context*);

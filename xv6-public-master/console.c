@@ -497,3 +497,11 @@ void consoleinit(void)
   cons.locking = 1;
   ioapicenable(IRQ_KBD, 0);
 }
+
+
+void
+printspaces(int count)
+{
+  for(int i = 0; i < count; ++i)
+    cprintf(" ");
+}

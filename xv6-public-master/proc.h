@@ -37,11 +37,6 @@ struct context {
 
 enum schedqueue {UNSET, ROUND_ROBIN, LCFS, BJF};
 
-struct lcfsinfo{
-  int arrival_time;
-};
-
-
 struct bjfinfo {
   int priority;
   float priority_ratio;
@@ -57,7 +52,7 @@ struct schedinfo {
   enum schedqueue queue;
   int last_run;
   struct bjfinfo bjf;
-  struct lcfsinfo lcfs; 
+  int arrival_queue_time;
 };
 enum procstate { UNUSED, EMBRYO, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 

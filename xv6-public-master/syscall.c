@@ -108,6 +108,8 @@ extern int sys_copy_file(void);
 extern int sys_get_uncle_count(void);
 extern int sys_get_process_lifetime(void);
 extern int sys_change_scheduling_queue(void);
+extern int sys_print_processes_info(void);
+
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -136,6 +138,7 @@ static int (*syscalls[])(void) = {
 [SYS_get_uncle_count] sys_get_uncle_count,
 [SYS_get_process_lifetime] sys_get_process_lifetime,
 [SYS_change_scheduling_queue]   sys_change_scheduling_queue,
+[SYS_print_processes_info] sys_print_processes_info
 };
 
 void
