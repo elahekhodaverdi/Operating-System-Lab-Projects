@@ -646,7 +646,7 @@ change_queue(int pid, int new_queue) {
       old_queue = p->sched_info.queue;
       p->sched_info.queue = new_queue;
 
-      // check if we need to aquire tickslock or not
+      // check if we need to aquire tickslock or not : elahe
       p->sched_info.arrival_queue_time = ticks;
       if (new_queue == ROUND_ROBIN) {
 
