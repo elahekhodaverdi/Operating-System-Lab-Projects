@@ -598,3 +598,48 @@ int
 get_process_lifetime(void) {
   return (sys_uptime() - myproc()->creation_time);
 }
+
+
+int
+change_queue(int pid, int new_queue) {
+  struct proc *p;
+  int old_queue = -1;
+
+  if(new_queue == UNSET){
+    if (pid == 1)
+      new_queue = ROUND_ROBIN;
+    else if (pid > 1)
+      new_queue = LCFS;
+    else
+      return -1;
+  }
+
+  acquire(&ptable.lock);
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    if(p->pid == pid){
+      old_queue = p->sched_info.queue;
+      p->sched_info.queue = new_queue;
+      if (new_queue == ROUND_ROBIN) {
+
+        //initialization for round robin
+
+        break;
+      }
+      if(new_queue == LCFS){
+
+        //initialization for lcfs
+
+        break;
+      }
+      else if(new_queue == BJF){
+
+        //initialization for bjf
+
+        break;
+      }
+      
+    }
+  }
+  release(&ptable.lock);
+  return old_queue;
+}
