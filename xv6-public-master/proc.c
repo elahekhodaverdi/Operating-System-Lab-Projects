@@ -319,12 +319,36 @@ wait(void)
 //  - swtch to start running that process
 //  - eventually that process transfers control
 //      via swtch back to the scheduler.
+
+
+struct proc*
+LCFS(void)
+{
+  struct proc* result = 0;
+
+
+  struct proc* p;
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    if(p->state != RUNNABLE || p->sched_info.queue != LCFS)
+      continue;
+    if(result != 0){
+      if(result->sched_info.lcfs.arrival_time < p->sched_info.lcfs.arrival_time)
+        result = p;
+    }
+    else
+      result = p;
+  }
+  return result;
+}
+
 void
 scheduler(void)
 {
   struct proc *p;
+  struct proc *lastScheduledRR = &ptable.proc[NPROC - 1];
   struct cpu *c = mycpu();
   c->proc = 0;
+  srand(ticks);
   
   for(;;){
     // Enable interrupts on this processor.
@@ -332,27 +356,38 @@ scheduler(void)
 
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
-    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-      if(p->state != RUNNABLE)
-        continue;
-
-      // Switch to chosen process.  It is the process's job
-      // to release ptable.lock and then reacquire it
-      // before jumping back to us.
-      c->proc = p;
-      switchuvm(p);
-      p->state = RUNNING;
-
-      swtch(&(c->scheduler), p->context);
-      switchkvm();
-
-      // Process is done running for now.
-      // It should have changed its p->state before coming back.
-      c->proc = 0;
+    p = roundrobin(lastScheduledRR);
+    if(p){
+      lastScheduledRR = p;
     }
-    release(&ptable.lock);
+    else{
+      p = lcfs();
+      if(!p){
+        p = bestjobfirst();
+        if(!p){
+          release(&ptable.lock);
+          continue;
+        }
+      }
+    }
 
+    // Switch to chosen process.  It is the process's job
+    // to release ptable.lock and then reacquire it
+    // before jumping back to us.
+    c->proc = p;
+    switchuvm(p);
+    p->state = RUNNING;
+
+    swtch(&(c->scheduler), p->context);
+    switchkvm();
+
+    // Process is done running for now.
+    // It should have changed its p->state before coming back.
+    c->proc = 0;
   }
+  release(&ptable.lock);
+
+  
 }
 
 // Enter scheduler.  Must hold only ptable.lock
