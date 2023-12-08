@@ -645,3 +645,30 @@ change_queue(int pid, int new_queue) {
   release(&ptable.lock);
   return old_queue;
 }
+
+
+
+
+void
+ageprocs(int os_ticks)
+{
+  struct proc *p;
+
+  acquire(&ptable.lock);
+
+  for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+  {
+    if (p->state == RUNNABLE && p->sched_info.queue != ROUND_ROBIN)
+    {
+      if (os_ticks - p->sched_info.last_run > AGING_THRESHOLD)
+      {
+        release(&ptable.lock);
+        change_queue(p->pid, ROUND_ROBIN);
+        acquire(&ptable.lock);
+      }
+    }
+  }
+
+  release(&ptable.lock);
+}
+

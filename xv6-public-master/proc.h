@@ -1,3 +1,5 @@
+#define AGING_THRESHOLD 8000
+
 // Per-CPU state
 struct cpu {
   uchar apicid;                // Local APIC ID
