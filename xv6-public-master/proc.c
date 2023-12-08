@@ -639,6 +639,7 @@ change_queue(int pid, int new_queue) {
     if(p->pid == pid){
       old_queue = p->sched_info.queue;
       p->sched_info.queue = new_queue;
+      p->sched_info.arrival_queue_time = ticks;
       if (new_queue == ROUND_ROBIN) {
 
         //initialization for round robin
