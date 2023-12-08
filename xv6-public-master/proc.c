@@ -631,7 +631,7 @@ change_queue(int pid, int new_queue) {
 
         break;
       }
-      else if(new_queue == BJF){
+      if(new_queue == BJF){
 
         //initialization for bjf
 
