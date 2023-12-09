@@ -77,13 +77,11 @@ allocproc(void)
 {
   struct proc *p;
   char *sp;
-
   acquire(&ptable.lock);
-
   for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
     if (p->state == UNUSED)
       goto found;
-
+  
   release(&ptable.lock);
   return 0;
 
@@ -160,7 +158,6 @@ void userinit(void)
   // writes to be visible, and the lock is also needed
   // because the assignment might not be atomic.
   acquire(&ptable.lock);
-
   p->state = RUNNABLE;
 
   release(&ptable.lock);
@@ -198,6 +195,7 @@ int fork(void)
   int i, pid;
   struct proc *np;
   struct proc *curproc = myproc();
+      cprintf("ggg\n");
 
   // Allocate process.
   if ((np = allocproc()) == 0)
@@ -228,13 +226,16 @@ int fork(void)
   safestrcpy(np->name, curproc->name, sizeof(curproc->name));
 
   pid = np->pid;
-  np->creation_time = ticks;
+
+
   acquire(&ptable.lock);
+  cprintf("ggg\n");
 
   np->state = RUNNABLE;
 
   /// initial ticks related variables : elahe
   acquire(&tickslock);
+  np->creation_time = ticks;
   np->sched_info.last_run = ticks;
   np->sched_info.bjf.arrival_time = ticks;
   release(&tickslock);
@@ -271,7 +272,6 @@ void exit(void)
   iput(curproc->cwd);
   end_op();
   curproc->cwd = 0;
-
   acquire(&ptable.lock);
 
   // Parent might be sleeping in wait().
@@ -698,7 +698,7 @@ int change_queue(int pid, int new_queue)
     else
       return -1;
   }
-
+ 
   acquire(&ptable.lock);
   for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
   {
@@ -739,9 +739,7 @@ int change_queue(int pid, int new_queue)
 void ageprocs(int os_ticks)
 {
   struct proc *p;
-
   acquire(&ptable.lock);
-
   for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
   {
     if (p->state == RUNNABLE && p->sched_info.queue != ROUND_ROBIN)
@@ -754,7 +752,6 @@ void ageprocs(int os_ticks)
       }
     }
   }
-
   release(&ptable.lock);
 }
 
@@ -826,34 +823,34 @@ void print_processes_info()
     printspaces(columns[0] - strlen(p->name));
 
     cprintf("%d", p->pid);
-    printspaces(columns[1] - digitcount(p->pid));
+    printspaces(columns[1] - count_digits(p->pid));
 
     cprintf("%s", state);
     printspaces(columns[2] - strlen(state));
 
     cprintf("%d", p->sched_info.queue);
-    printspaces(columns[3] - digitcount(p->sched_info.queue));
+    printspaces(columns[3] - count_digits(p->sched_info.queue));
 
     cprintf("%d", (int)p->sched_info.bjf.executed_cycle);
-    printspaces(columns[4] - digitcount((int)p->sched_info.bjf.executed_cycle));
+    printspaces(columns[4] - count_digits((int)p->sched_info.bjf.executed_cycle));
 
     cprintf("%d", p->sched_info.bjf.arrival_time);
-    printspaces(columns[5] - digitcount(p->sched_info.bjf.arrival_time));
+    printspaces(columns[5] - count_digits(p->sched_info.bjf.arrival_time));
 
     cprintf("%d", p->sched_info.bjf.priority);
-    printspaces(columns[6] - digitcount(p->sched_info.bjf.priority));
+    printspaces(columns[6] - count_digits(p->sched_info.bjf.priority));
 
     cprintf("%d", (int)p->sched_info.bjf.priority_ratio);
-    printspaces(columns[7] - digitcount((int)p->sched_info.bjf.priority_ratio));
+    printspaces(columns[7] - count_digits((int)p->sched_info.bjf.priority_ratio));
 
     cprintf("%d", (int)p->sched_info.bjf.arrival_time_ratio);
-    printspaces(columns[8] - digitcount((int)p->sched_info.bjf.arrival_time_ratio));
+    printspaces(columns[8] - count_digits((int)p->sched_info.bjf.arrival_time_ratio));
 
     cprintf("%d", (int)p->sched_info.bjf.executed_cycle_ratio);
-    printspaces(columns[9] - digitcount((int)p->sched_info.bjf.executed_cycle_ratio));
+    printspaces(columns[9] - count_digits((int)p->sched_info.bjf.executed_cycle_ratio));
 
     cprintf("%d", (int)p->sched_info.bjf.process_size_ratio);
-    printspaces(columns[10] - digitcount((int)p->sched_info.bjf.process_size_ratio));
+    printspaces(columns[10] - count_digits((int)p->sched_info.bjf.process_size_ratio));
 
     cprintf("%d", (int)bjfrank(p));
     cprintf("\n");

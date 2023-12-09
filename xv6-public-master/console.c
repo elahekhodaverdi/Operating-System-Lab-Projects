@@ -505,3 +505,12 @@ printspaces(int count)
   for(int i = 0; i < count; ++i)
     cprintf(" ");
 }
+
+int count_digits(int n) {
+  int count = 0;
+  while(n!= 0) {
+    n/=10;
+    ++count;
+  }
+  return count;
+}

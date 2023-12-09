@@ -13,7 +13,7 @@ void help()
 
 void print_info()
 {
-    print_process_info();
+    print_processes_info();
 }
 
 void set_queue(int pid, int new_queue)
@@ -46,14 +46,14 @@ void set_bjf_params(int pid, int priority_ratio, int arrival_time_ratio, int exe
     }
     int res;
     if (system)
-        res = set_bjf_params_system(priority_ratio, arrival_time_ratio, executed_cycle_ratio);
+        res = set_system_bjf_params(priority_ratio, arrival_time_ratio, executed_cycle_ratio, process_size_ratio);
     else if (pid < 1)
     {
         printf(1, "Invalid pid\n");
         return;
     }
     else
-        res = set_bjf_params_process(pid, priority_ratio, arrival_time_ratio, executed_cycle_ratio);
+        res = set_proc_bjf_params(pid, priority_ratio, arrival_time_ratio, executed_cycle_ratio, process_size_ratio);
     
     if (res < 0)
         printf(1, "Error setting BJF params\n");
