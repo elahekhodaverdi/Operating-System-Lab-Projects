@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": false,
-      "cwd": "/home/atefeh/xv6-public/Operating-System-Lab-Projects-2/xv6-public-master",
-      "program": "/home/atefeh/xv6-public/Operating-System-Lab-Projects-2/xv6-public-master/build/Debug/outDebug",
+      "cwd": "/home/atefeh/Operating-System-Lab-Projects/xv6-public-master",
+      "program": "/home/atefeh/Operating-System-Lab-Projects/xv6-public-master/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
