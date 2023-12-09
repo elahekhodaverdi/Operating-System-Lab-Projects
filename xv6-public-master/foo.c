@@ -1,17 +1,28 @@
 #include "types.h"
 #include "user.h"
 
-int main() {
-    for(int i = 0; i < 5; i++) {
-        if(fork() == 0) {
-            for(int j = 0; j < 1000000; j++) {}
+#define PROCS_NUM 5
+
+int main()
+{
+    for (int i = 0; i < PROCS_NUM; ++i)
+    {
+        int pid = fork();
+        if (pid == 0)
+        {
             sleep(5000);
-            return 0;
+            for (int j = 0; j < 100 * i; ++j)
+            {
+                int x = 1;
+                for (long k = 0; k < 10000; ++k)
+                    x++;
+            }
+            exit();
         }
     }
-
-    for(int i = 0; i < 5; i++) {
+    printf(1, "df\n");
+    for (int i = 0; i < PROCS_NUM; i++)
         wait();
-    }
-    return 0;
+    printf(1, "df\n");
+    exit();
 }

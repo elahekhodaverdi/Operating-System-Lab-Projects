@@ -22,6 +22,7 @@ void            cprintf(char*, ...);
 void            consoleintr(int(*)(void));
 void            panic(char*) __attribute__((noreturn));
 void            printspaces(int count);
+int             count_digits(int n);
 
 // exec.c
 int             exec(char*, char**);

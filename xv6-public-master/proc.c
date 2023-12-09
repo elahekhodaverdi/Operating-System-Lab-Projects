@@ -159,7 +159,6 @@ void userinit(void)
   // because the assignment might not be atomic.
   acquire(&ptable.lock);
   p->state = RUNNABLE;
-
   release(&ptable.lock);
   change_queue(p->pid, UNSET);
 }
@@ -195,7 +194,6 @@ int fork(void)
   int i, pid;
   struct proc *np;
   struct proc *curproc = myproc();
-      cprintf("ggg\n");
 
   // Allocate process.
   if ((np = allocproc()) == 0)
@@ -229,7 +227,6 @@ int fork(void)
 
 
   acquire(&ptable.lock);
-  cprintf("ggg\n");
 
   np->state = RUNNABLE;
 
@@ -433,13 +430,16 @@ void scheduler(void)
 
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
+
     p = roundrobin(lastScheduledRR);
+
     if (p)
     {
       lastScheduledRR = p;
     }
     else
     {
+
       p = lcfs();
       if (!p)
       {
@@ -455,21 +455,28 @@ void scheduler(void)
     // Switch to chosen process.  It is the process's job
     // to release ptable.lock and then reacquire it
     // before jumping back to us.
+
     c->proc = p;
     switchuvm(p);
+
     p->state = RUNNING;
 
     // initial some ticks related variable again  elahe
     p->sched_info.last_run = ticks;
+
     p->sched_info.bjf.executed_cycle += 0.1f;
+
     swtch(&(c->scheduler), p->context);
+
     switchkvm();
 
     // Process is done running for now.
     // It should have changed its p->state before coming back.
     c->proc = 0;
-  }
   release(&ptable.lock);
+
+  }
+
 }
 
 // Enter scheduler.  Must hold only ptable.lock
@@ -698,7 +705,6 @@ int change_queue(int pid, int new_queue)
     else
       return -1;
   }
- 
   acquire(&ptable.lock);
   for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
   {
