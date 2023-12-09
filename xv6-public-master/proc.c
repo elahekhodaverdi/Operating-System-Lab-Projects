@@ -425,7 +425,6 @@ void scheduler(void)
   struct proc *lastScheduledRR = &ptable.proc[NPROC - 1];
   struct cpu *c = mycpu();
   c->proc = 0;
-  srand(ticks);
 
   for (;;)
   {
