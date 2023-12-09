@@ -127,7 +127,7 @@ void sys_print_processes_info(void) {
 }
 
 int
-sys_set_bjf_params(void)
+sys_set_proc_bjf_params(void)
 {
   int pid;
   float priority_ratio, arrival_time_ratio, executed_cycle_ratio, process_size_ratio;
