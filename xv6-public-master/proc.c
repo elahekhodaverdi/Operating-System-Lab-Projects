@@ -113,7 +113,6 @@ found:
   memset(p->context, 0, sizeof *p->context);
   p->context->eip = (uint)forkret;
 
-  /// initial new variable : elahe
   p->sched_info.bjf.arrival_time = ticks;
   p->sched_info.queue = UNSET;
   p->sched_info.bjf.priority = 3;
@@ -230,7 +229,6 @@ int fork(void)
 
   np->state = RUNNABLE;
 
-  /// initial ticks related variables : elahe
   acquire(&tickslock);
   np->creation_time = ticks;
   np->sched_info.last_run = ticks;
@@ -368,9 +366,9 @@ lcfs(void)
 }
 
 struct proc *
-roundrobin(struct proc *lastScheduled)
+roundrobin(struct proc *last_scheduled)
 {
-  struct proc *p = lastScheduled;
+  struct proc *p = last_scheduled;
   for (;;)
   {
     p++;
@@ -380,7 +378,7 @@ roundrobin(struct proc *lastScheduled)
     if (p->state == RUNNABLE && p->sched_info.queue == ROUND_ROBIN)
       return p;
 
-    if (p == lastScheduled)
+    if (p == last_scheduled)
       return 0;
   }
 }
@@ -418,7 +416,7 @@ bestjobfirst(void)
 void scheduler(void)
 {
   struct proc *p;
-  struct proc *lastScheduledRR = &ptable.proc[NPROC - 1];
+  struct proc *last_scheduled_RR = &ptable.proc[NPROC - 1];
   struct cpu *c = mycpu();
   c->proc = 0;
 
@@ -430,11 +428,11 @@ void scheduler(void)
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
 
-    p = roundrobin(lastScheduledRR);
+    p = roundrobin(last_scheduled_RR);
 
     if (p)
     {
-      lastScheduledRR = p;
+      last_scheduled_RR = p;
     }
     else
     {
@@ -460,7 +458,6 @@ void scheduler(void)
 
     p->state = RUNNING;
 
-    // initial some ticks related variable again  elahe
     p->sched_info.last_run = ticks;
 
     p->sched_info.bjf.executed_cycle += 0.1f;
