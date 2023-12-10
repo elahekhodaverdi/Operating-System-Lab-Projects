@@ -58,7 +58,7 @@ void set_bjf_params(int pid, int priority_ratio, int arrival_time_ratio, int exe
     if (res < 0)
         printf(1, "Error setting BJF params\n");
     else
-        printf(1, "BJF params set successfully\n");
+        printf(1, "BJF params has been set successfully\n");
 }
 
 void wrong_command(){
@@ -84,14 +84,14 @@ int main(int argc, char *argv[])
     {
         if (argc < 7)
             wrong_command();
-        set_bjf_params(atoi(argv[2]), atoi(argv[3]), atoi(argv[4]), atoi(argv[5]),atoi(argv[6]),1);
+        set_bjf_params(atoi(argv[2]), atoi(argv[3]), atoi(argv[4]), atoi(argv[5]),atoi(argv[6]),0);
     }
 
     else if (!strcmp(argv[1], "set_system_bjf"))
     {
         if (argc < 6)
             wrong_command();
-        set_bjf_params(0,atoi(argv[2]), atoi(argv[3]), atoi(argv[4]),atoi(argv[5]),0);
+        set_bjf_params(0,atoi(argv[2]), atoi(argv[3]), atoi(argv[4]),atoi(argv[5]),1);
     }
     else
         help();

@@ -239,7 +239,6 @@ int fork(void)
 
   release(&ptable.lock);
   change_queue(np->pid, UNSET);
-
   return pid;
 }
 
@@ -713,29 +712,7 @@ int change_queue(int pid, int new_queue)
       old_queue = p->sched_info.queue;
       p->sched_info.queue = new_queue;
 
-      // check if we need to aquire tickslock or not : elahe
       p->sched_info.arrival_queue_time = ticks;
-      if (new_queue == ROUND_ROBIN)
-      {
-
-        // initialization for round robin
-
-        break;
-      }
-      if (new_queue == LCFS)
-      {
-
-        // initialization for lcfs
-
-        break;
-      }
-      if (new_queue == BJF)
-      {
-
-        // initialization for bjf
-
-        break;
-      }
     }
   }
   release(&ptable.lock);

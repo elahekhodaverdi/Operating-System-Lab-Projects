@@ -11,18 +11,16 @@ int main()
         if (pid == 0)
         {
             sleep(5000);
-            for (int j = 0; j < 100 * i; ++j)
+            for (int j = 0; j < 1000; ++j)
             {
                 int x = 1;
-                for (long k = 0; k < 10000; ++k)
+                for (long k = 0; k < 100000; ++k)
                     x++;
             }
             exit();
         }
     }
-    printf(1, "df\n");
     for (int i = 0; i < PROCS_NUM; i++)
         wait();
-    printf(1, "df\n");
     exit();
 }
