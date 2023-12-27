@@ -28,4 +28,4 @@
 #define SYS_print_processes_info 27
 #define SYS_set_proc_bjf_params 28
 #define SYS_set_system_bjf_params 29
-
+#define SYS_prioritylock_test 30

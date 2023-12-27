@@ -126,7 +126,7 @@ extern int sys_change_scheduling_queue(void);
 extern int sys_print_processes_info(void);
 extern int sys_set_proc_bjf_params(void);
 extern int sys_set_system_bjf_params(void);
-
+extern int sys_prioritylock_test(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -158,6 +158,7 @@ static int (*syscalls[])(void) = {
 [SYS_print_processes_info] sys_print_processes_info,
 [SYS_set_proc_bjf_params]    sys_set_proc_bjf_params,
 [SYS_set_system_bjf_params]     sys_set_system_bjf_params,
+[SYS_prioritylock_test] sys_prioritylock_test 
 };
 
 void

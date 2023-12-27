@@ -158,3 +158,7 @@ sys_set_system_bjf_params(void)
   set_system_bjf_params(priority_ratio, arrival_time_ratio, executed_cycle_ratio,process_size_ratio);
   return 0;
 }
+
+void sys_prioritylock_test(void){
+    prioritylock_test();
+}

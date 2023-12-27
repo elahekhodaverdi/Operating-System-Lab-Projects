@@ -7,6 +7,7 @@ struct proc;
 struct rtcdate;
 struct spinlock;
 struct sleeplock;
+struct prioritylock;
 struct stat;
 struct superblock;
 
@@ -132,7 +133,8 @@ void            print_processes_info(void);
 void            print_priority_queue(void *chan);
 int             set_proc_bjf_params(int, float, float, float,float);
 int             set_system_bjf_params(float, float, float,float);
-
+void            prioritylock_test(void);
+void            buf_test_init(void);
 // swtch.S
 void            swtch(struct context**, struct context*);
 
@@ -150,6 +152,12 @@ void            acquiresleep(struct sleeplock*);
 void            releasesleep(struct sleeplock*);
 int             holdingsleep(struct sleeplock*);
 void            initsleeplock(struct sleeplock*, char*);
+
+// prioritylock.c
+void            initprioritylock(struct prioritylock *, char *);
+void            acquirepriority(struct prioritylock *);
+void            releasepriority(struct prioritylock *);
+int             holdingpriority(struct prioritylock *);
 
 // string.c
 int             memcmp(const void*, const void*, uint);

@@ -6,7 +6,13 @@
 #include "x86.h"
 #include "proc.h"
 #include "spinlock.h"
+#include "sleeplock.h"
+#include "prioritylock.h"
 
+struct {
+  int number;
+  struct prioritylock lock;
+} buffer_test;
 struct
 {
   struct spinlock lock;
@@ -20,6 +26,12 @@ extern void forkret(void);
 extern void trapret(void);
 
 static void wakeup1(void *chan);
+
+void buf_test_init(void)
+{
+  buffer_test.number = 0;
+  initprioritylock(&buffer_test.lock, "test_buffer");
+}
 
 void pinit(void)
 {
@@ -871,6 +883,7 @@ void sort_queue(struct proc queue_priority[], int num_proc) {
 }
 
 void print_queue(struct proc queue_priority[], int num_proc) {
+  cprintf("queue_priority: \n");
   for (int i = 0; i < num_proc; i++) {
     cprintf("PID: %d, Name: %s\n", queue_priority[i].pid, queue_priority[i].name);
   }
@@ -890,4 +903,24 @@ void print_priority_queue(void *chan){
   sort_queue(queue_priority, num_proc);
   print_queue(queue_priority, num_proc);
   release(&ptable.lock);
+}
+
+
+void prioritylock_test(){
+  // acquire
+  acquirepriority(&buffer_test.lock);
+  // print pid dprocess
+  cprintf("Process with pid %d accessed the lock\n", myproc()->pid);
+  // print queue
+  print_priority_queue(&buffer_test.lock);
+  // do some stuff that takes time 
+  // Do nothing
+
+  for(int i = 0; i < 100000; i++) {
+    for(int j = 0; j < 100000; j++) {
+    }
+  }
+  buffer_test.number += 1;
+  // relese
+  releasepriority(&buffer_test.lock);
 }
