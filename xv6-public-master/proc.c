@@ -591,6 +591,27 @@ void wakeup(void *chan)
   release(&ptable.lock);
 }
 
+void wakeup2(void *chan)
+{
+  acquire(&ptable.lock);
+  struct proc *p;
+  struct proc *p_f = 0;
+
+  for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+    if (p->state == SLEEPING && p->chan == chan){
+      if(p_f){
+        if(p_f->pid > p->pid)
+          p_f = p;
+      }
+      else{
+        p_f = p;
+      }
+    }
+      
+  p_f->state = RUNNABLE;
+  release(&ptable.lock);
+}
+
 // Kill the process with the given pid.
 // Process won't exit until it returns
 // to user space (see trap in trap.c).
@@ -835,4 +856,38 @@ void print_processes_info()
     cprintf("%d", (int)bjfrank(p));
     cprintf("\n");
   }
+}
+
+void sort_queue(struct proc queue_priority[], int num_proc) {
+  for (int i = 0; i < num_proc - 1; i++) {
+    for (int j = 0; j < num_proc - i - 1; j++) {
+      if (queue_priority[j].pid > queue_priority[j + 1].pid) {
+        struct proc temp = queue_priority[j];
+        queue_priority[j] = queue_priority[j + 1];
+        queue_priority[j + 1] = temp;
+      }
+    }
+  }
+}
+
+void print_queue(struct proc queue_priority[], int num_proc) {
+  for (int i = 0; i < num_proc; i++) {
+    cprintf("PID: %d, Name: %s\n", queue_priority[i].pid, queue_priority[i].name);
+  }
+}
+
+void print_priority_queue(void *chan){
+  acquire(&ptable.lock);
+  struct proc *p;
+  struct proc queue_priority[NPROC];
+  int num_proc = 0;
+  for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+    if (p->chan == chan){
+      queue_priority[num_proc] = *p;
+      num_proc++;
+    }
+  
+  sort_queue(queue_priority, num_proc);
+  print_queue(queue_priority, num_proc);
+  release(&ptable.lock);
 }

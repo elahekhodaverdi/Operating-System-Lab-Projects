@@ -122,12 +122,14 @@ void            sleep(void*, struct spinlock*);
 void            userinit(void);
 int             wait(void);
 void            wakeup(void*);
+void            wakeup2(void*);
 void            yield(void);
 int             find_digital_root(int);
 int             get_child_count(void);
 int             get_process_lifetime(void);
 int             change_queue(int, int);
 void            print_processes_info(void);
+void            print_priority_queue(void *chan);
 int             set_proc_bjf_params(int, float, float, float,float);
 int             set_system_bjf_params(float, float, float,float);
 
