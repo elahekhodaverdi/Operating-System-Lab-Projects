@@ -35,7 +35,7 @@ void
 releasepriority(struct prioritylock *lk)
 {
   if (myproc()->pid != lk->pid)
-    panic('release');
+    panic("release");
     
   acquire(&lk->lk);
   lk->locked = 0;
