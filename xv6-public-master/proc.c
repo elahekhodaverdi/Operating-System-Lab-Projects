@@ -891,7 +891,7 @@ void sort_prioritylock_queue(struct proc *procs, int n) {
 void print_queue(struct proc *procs, int n) {
   cprintf("Prioritylock Queue: \n");
   for (int i = 0; i < n; i++) {
-    printf(1, "pid: %d, name: %s\n", procs[i].pid, procs[i].name);
+    cprintf("pid: %d, name: %s\n", procs[i].pid, procs[i].name);
   }
 }
 
@@ -906,13 +906,13 @@ void print_priority_queue(void *chan)
   for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
     if (p->state == SLEEPING && p->chan == chan)
     {
-      copy_proc(&queue_priority[m], &p);
+      copy_proc(&queue_priority[m], p);
       m++;
     }
 
   if(m){
     sort_prioritylock_queue(queue_priority, m);
-    print_procs(queue_priority, m);
+    print_queue(queue_priority, m);
   }
   release(&ptable.lock);
 }
