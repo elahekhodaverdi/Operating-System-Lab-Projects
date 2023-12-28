@@ -9,7 +9,8 @@
 #include "sleeplock.h"
 #include "prioritylock.h"
 
-struct {
+struct
+{
   int number;
   struct prioritylock lock;
 } buffer_test;
@@ -93,7 +94,7 @@ allocproc(void)
   for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
     if (p->state == UNUSED)
       goto found;
-  
+
   release(&ptable.lock);
   return 0;
 
@@ -235,7 +236,6 @@ int fork(void)
   safestrcpy(np->name, curproc->name, sizeof(curproc->name));
 
   pid = np->pid;
-
 
   acquire(&ptable.lock);
 
@@ -481,10 +481,8 @@ void scheduler(void)
     // Process is done running for now.
     // It should have changed its p->state before coming back.
     c->proc = 0;
-  release(&ptable.lock);
-
+    release(&ptable.lock);
   }
-
 }
 
 // Enter scheduler.  Must hold only ptable.lock
@@ -610,17 +608,20 @@ void wakeup2(void *chan)
   struct proc *p_f = 0;
 
   for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
-    if (p->state == SLEEPING && p->chan == chan){
-      if(p_f){
-        if(p_f->pid > p->pid)
+    if (p->state == SLEEPING && p->chan == chan)
+    {
+      if (p_f)
+      {
+        if (p_f->pid > p->pid)
           p_f = p;
       }
-      else{
+      else
+      {
         p_f = p;
       }
     }
-      
-  p_f->state = RUNNABLE;
+  if (p_f)
+    p_f->state = RUNNABLE;
   release(&ptable.lock);
 }
 
@@ -759,6 +760,7 @@ void ageprocs(int os_ticks)
     {
       if (os_ticks - p->sched_info.last_run > AGING_THRESHOLD)
       {
+        cprintf("\nchange queue after aging for %d process and os_ticks is %d\n", p->pid, os_ticks);
         release(&ptable.lock);
         change_queue(p->pid, ROUND_ROBIN);
         acquire(&ptable.lock);
@@ -870,10 +872,14 @@ void print_processes_info()
   }
 }
 
-void sort_queue(struct proc queue_priority[], int num_proc) {
-  for (int i = 0; i < num_proc - 1; i++) {
-    for (int j = 0; j < num_proc - i - 1; j++) {
-      if (queue_priority[j].pid > queue_priority[j + 1].pid) {
+void sort_queue(struct proc queue_priority[], int num_proc)
+{
+  for (int i = 0; i < num_proc - 1; i++)
+  {
+    for (int j = 0; j < num_proc - i - 1; j++)
+    {
+      if (queue_priority[j].pid > queue_priority[j + 1].pid)
+      {
         struct proc temp = queue_priority[j];
         queue_priority[j] = queue_priority[j + 1];
         queue_priority[j + 1] = temp;
@@ -882,45 +888,57 @@ void sort_queue(struct proc queue_priority[], int num_proc) {
   }
 }
 
-void print_queue(struct proc queue_priority[], int num_proc) {
+void print_queue(struct proc queue_priority[], int num_proc)
+{
   cprintf("queue_priority: \n");
-  for (int i = 0; i < num_proc; i++) {
+  for (int i = 0; i < num_proc; i++)
+  {
     cprintf("PID: %d, Name: %s\n", queue_priority[i].pid, queue_priority[i].name);
   }
 }
 
-void print_priority_queue(void *chan){
+void print_priority_queue(void *chan)
+{
   acquire(&ptable.lock);
   struct proc *p;
   struct proc queue_priority[NPROC];
+  struct proc *p_q = queue_priority;
   int num_proc = 0;
   for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
-    if (p->chan == chan){
-      queue_priority[num_proc] = *p;
+    if (p->state == SLEEPING && p->chan == chan)
+    {
+      p_q = p;
       num_proc++;
+      p_q++;
     }
-  
+
   sort_queue(queue_priority, num_proc);
   print_queue(queue_priority, num_proc);
   release(&ptable.lock);
 }
 
-
-void prioritylock_test(){
+void prioritylock_test()
+{
   // acquire
+  cprintf("Process with pid %d entering critical section\n", myproc()->pid);
   acquirepriority(&buffer_test.lock);
   // print pid dprocess
   cprintf("Process with pid %d accessed the lock\n", myproc()->pid);
   // print queue
   print_priority_queue(&buffer_test.lock);
-  // do some stuff that takes time 
+  // do some stuff that takes time
   // Do nothing
-
-  for(int i = 0; i < 100000; i++) {
-    for(int j = 0; j < 100000; j++) {
+  long long a =0;
+  for (long long i = 0; i < 10000000000; i++)
+  {
+    for (long long j = 0; j < 10000000000; j++)
+    {
+      if( i == 10000)
+        a+=1;
     }
   }
   buffer_test.number += 1;
   // relese
   releasepriority(&buffer_test.lock);
+  cprintf("Process with pid %d leaving critical section\n\n", myproc()->pid);
 }
