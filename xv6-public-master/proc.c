@@ -872,73 +872,76 @@ void print_processes_info()
   }
 }
 
-void sort_queue(struct proc queue_priority[], int num_proc)
-{
-  for (int i = 0; i < num_proc - 1; i++)
-  {
-    for (int j = 0; j < num_proc - i - 1; j++)
-    {
-      if (queue_priority[j].pid > queue_priority[j + 1].pid)
-      {
-        struct proc temp = queue_priority[j];
-        queue_priority[j] = queue_priority[j + 1];
-        queue_priority[j + 1] = temp;
+void copy_proc(struct proc *dst, struct proc *src) {
+  *dst = *src;
+}
+
+void sort_prioritylock_queue(struct proc *procs, int n) {
+  for (int i = 0; i < n - 1; i++) {
+    for (int j = 0; j < n - i - 1; j++) {
+      if (procs[j].pid > procs[j + 1].pid) {
+        struct proc temp = procs[j];
+        procs[j] = procs[j + 1];
+        procs[j + 1] = temp;
       }
     }
   }
 }
 
-void print_queue(struct proc queue_priority[], int num_proc)
-{
-  cprintf("queue_priority: \n");
-  for (int i = 0; i < num_proc; i++)
-  {
-    cprintf("PID: %d, Name: %s\n", queue_priority[i].pid, queue_priority[i].name);
+void print_queue(struct proc *procs, int n) {
+  cprintf("Prioritylock Queue: \n");
+  for (int i = 0; i < n; i++) {
+    printf(1, "pid: %d, name: %s\n", procs[i].pid, procs[i].name);
   }
 }
+
 
 void print_priority_queue(void *chan)
 {
   acquire(&ptable.lock);
+  
   struct proc *p;
+  int m = 0;
   struct proc queue_priority[NPROC];
-  struct proc *p_q = queue_priority;
-  int num_proc = 0;
   for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
     if (p->state == SLEEPING && p->chan == chan)
     {
-      p_q = p;
-      num_proc++;
-      p_q++;
+      copy_proc(&queue_priority[m], &p);
+      m++;
     }
 
-  sort_queue(queue_priority, num_proc);
-  print_queue(queue_priority, num_proc);
+  if(m){
+    sort_prioritylock_queue(queue_priority, m);
+    print_procs(queue_priority, m);
+  }
   release(&ptable.lock);
 }
 
 void prioritylock_test()
 {
-  // acquire
   cprintf("Process with pid %d entering critical section\n", myproc()->pid);
   acquirepriority(&buffer_test.lock);
-  // print pid dprocess
+
   cprintf("Process with pid %d accessed the lock\n", myproc()->pid);
-  // print queue
-  print_priority_queue(&buffer_test.lock);
-  // do some stuff that takes time
-  // Do nothing
-  long long a =0;
-  for (long long i = 0; i < 10000000000; i++)
+
+  long long a = 0;
+  for (long long i = 0; i < 1000000; i++)
   {
-    for (long long j = 0; j < 10000000000; j++)
+    for (long long j = 0; j < 1000000; j++)
     {
-      if( i == 10000)
-        a+=1;
+      a =0;
+      for (long long l = 0; l < 10000000000; l++)
+        for (long long s = 0; s < 1000000000; s++)
+          for (long long k = 0; k < 2000000000; k++)
+          {
+              a += 5 * 6 / 2 * a;
+          }
     }
   }
+  print_priority_queue(&buffer_test.lock);
+
   buffer_test.number += 1;
-  // relese
+
   releasepriority(&buffer_test.lock);
-  cprintf("Process with pid %d leaving critical section\n\n", myproc()->pid);
+  cprintf("\nProcess with pid %d leaving critical section\n\n", myproc()->pid);
 }
