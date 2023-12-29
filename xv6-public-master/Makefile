@@ -16,6 +16,7 @@ OBJS = \
 	pipe.o\
 	proc.o\
 	sleeplock.o\
+	prioritylock.o\
 	spinlock.o\
 	string.o\
 	swtch.o\
@@ -187,6 +188,7 @@ UPROGS=\
 	_copy_file\
 	_get_process_lifetime\
 	_schedule\
+	_test_prioritylock\
 	_foo\
 
 fs.img: mkfs README $(UPROGS)
@@ -260,6 +262,7 @@ EXTRA=\
 	printf.c umalloc.c\
 	digital_root.c\
 	schedule.c\
+	test_prioritylock.c\
 	foo.c\
 	copy_file.c\
 	get_uncle_count.c\

@@ -6,7 +6,4 @@ struct prioritylock {
   // For debugging:
   char *name;        // Name of lock.
   int pid;           // Process holding lock
-  // int  num_queue_proc;
-  // struct proc queue[NPROC];
 };
-

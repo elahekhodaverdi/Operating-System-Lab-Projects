@@ -1,4 +1,4 @@
-#define AGING_THRESHOLD 8000
+#define AGING_THRESHOLD 6000
 
 // Per-CPU state
 struct cpu {
