@@ -872,14 +872,19 @@ void print_processes_info()
   }
 }
 
-void copy_proc(struct proc *dst, struct proc *src) {
+void copy_proc(struct proc *dst, struct proc *src)
+{
   *dst = *src;
 }
 
-void sort_prioritylock_queue(struct proc *procs, int n) {
-  for (int i = 0; i < n - 1; i++) {
-    for (int j = 0; j < n - i - 1; j++) {
-      if (procs[j].pid > procs[j + 1].pid) {
+void sort_prioritylock_queue(struct proc *procs, int n)
+{
+  for (int i = 0; i < n - 1; i++)
+  {
+    for (int j = 0; j < n - i - 1; j++)
+    {
+      if (procs[j].pid > procs[j + 1].pid)
+      {
         struct proc temp = procs[j];
         procs[j] = procs[j + 1];
         procs[j + 1] = temp;
@@ -888,32 +893,39 @@ void sort_prioritylock_queue(struct proc *procs, int n) {
   }
 }
 
-void print_queue(struct proc *procs, int n) {
+void print_queue(struct proc *procs, int n)
+{
   cprintf("Prioritylock Queue: \n");
-  for (int i = 0; i < n; i++) {
+  for (int i = 0; i < n; i++)
+  {
     cprintf("pid: %d, name: %s\n", procs[i].pid, procs[i].name);
   }
 }
 
-
 void print_priority_queue(void *chan)
 {
   acquire(&ptable.lock);
-  
+
   struct proc *p;
   int m = 0;
   struct proc queue_priority[NPROC];
+  //cprintf("chan %d\n", chan);
   for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
     if (p->state == SLEEPING && p->chan == chan)
     {
       copy_proc(&queue_priority[m], p);
+      //cprintf("pid: %d\n", p->pid);
       m++;
     }
+    else
+    {
+      //cprintf("pchan %d\n", p->chan);
+    }
 
-  if(m){
-    sort_prioritylock_queue(queue_priority, m);
-    print_queue(queue_priority, m);
-  }
+  // if(m){
+  //   sort_prioritylock_queue(queue_priority, m);
+  //   print_queue(queue_priority, m);
+  // }
   release(&ptable.lock);
 }
 
@@ -924,20 +936,15 @@ void prioritylock_test()
 
   cprintf("Process with pid %d accessed the lock\n", myproc()->pid);
 
-  long long a = 0;
-  for (long long i = 0; i < 1000000; i++)
-  {
-    for (long long j = 0; j < 1000000; j++)
-    {
-      a =0;
-      for (long long l = 0; l < 10000000000; l++)
-        for (long long s = 0; s < 1000000000; s++)
-          for (long long k = 0; k < 2000000000; k++)
-          {
-              a += 5 * 6 / 2 * a;
-          }
-    }
-  }
+  volatile long long a = 3;
+  volatile long long b = 4;
+  volatile long long temp = 0;
+  for (long long l = 0; l < 10000; l++)
+    for (long long s = 0; s < 100; s++)
+        for (long long k = 0; k < 200; k++)
+        {
+            temp += a * b;
+        }
   print_priority_queue(&buffer_test.lock);
 
   buffer_test.number += 1;
