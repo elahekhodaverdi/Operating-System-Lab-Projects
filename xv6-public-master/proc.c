@@ -919,7 +919,7 @@ void prioritylock_test()
   print_priority_queue(&buffer_test.lock);
 
   buffer_test.number += 1;
-
+  
   releasepriority(&buffer_test.lock);
   cprintf("\nProcess with pid %d leaving critical section\n\n", myproc()->pid);
 }

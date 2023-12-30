@@ -13,7 +13,6 @@ int main()
         if (pid == 0)
         {
             prioritylock_test();
-            // printf(1,"lewwwwww\n");
             exit();
         }
     }
