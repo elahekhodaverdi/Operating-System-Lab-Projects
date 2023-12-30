@@ -874,7 +874,8 @@ void print_processes_info()
 
 void copy_proc(struct proc *dst, struct proc *src)
 {
-  *dst = *src;
+  dst->pid = src->pid;
+  // strncpy(dst->name,src->name);
 }
 
 void sort_prioritylock_queue(struct proc *procs, int n)
@@ -885,9 +886,11 @@ void sort_prioritylock_queue(struct proc *procs, int n)
     {
       if (procs[j].pid > procs[j + 1].pid)
       {
-        struct proc temp = procs[j];
-        procs[j] = procs[j + 1];
-        procs[j + 1] = temp;
+        
+        struct proc temp[1];
+        copy_proc(temp,&procs[j]);
+        copy_proc(&procs[j],&procs[j+1]);
+        copy_proc(&procs[j+1],temp);
       }
     }
   }
@@ -895,10 +898,14 @@ void sort_prioritylock_queue(struct proc *procs, int n)
 
 void print_queue(struct proc *procs, int n)
 {
-  cprintf("Prioritylock Queue: \n");
+  cprintf("Prioritylock Queue:\n");
+  if(n == 0){
+    cprintf("Queue is empty\n");
+    return;
+  }
   for (int i = 0; i < n; i++)
   {
-    cprintf("pid: %d, name: %s\n", procs[i].pid, procs[i].name);
+    cprintf("pid: %d\n", procs[i].pid);
   }
 }
 
@@ -908,20 +915,28 @@ void print_priority_queue(void *chan)
 
   struct proc *p;
   int m = 0;
-  struct proc queue_priority[NPROC];
-  //cprintf("chan %d\n", chan);
-  for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+  // struct proc queue_priority[NPROC];
+  struct proc * p_f = 0;
+  cprintf("\nPriority Queue:\n");
+  for (p = ptable.proc; p < &ptable.proc[NPROC]; p++){
     if (p->state == SLEEPING && p->chan == chan)
     {
-      copy_proc(&queue_priority[m], p);
-      //cprintf("pid: %d\n", p->pid);
+      if(p_f && p_f->pid < p->pid){
+        p_f = p;
+      }
+      else {
+        p_f = p;
+      }
+      // copy_proc(&queue_priority[m], p);
+      // cprintf("pid3: %d\n",queue_priority[m].pid);
+      cprintf("pid: %d\n",p->pid);
       m++;
     }
-    else
-    {
-      //cprintf("pchan %d\n", p->chan);
-    }
-
+  }
+  if(m == 0)
+    cprintf("Queue is empty.\n");
+  if(p_f)
+    cprintf("Process with highest priority has pid: %d\n",p_f->pid);
   // if(m){
   //   sort_prioritylock_queue(queue_priority, m);
   //   print_queue(queue_priority, m);
