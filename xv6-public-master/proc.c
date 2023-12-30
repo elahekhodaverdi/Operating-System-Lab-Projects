@@ -612,7 +612,7 @@ void wakeup2(void *chan)
     {
       if (p_f)
       {
-        if (p_f->pid > p->pid)
+        if (p_f->pid < p->pid)
           p_f = p;
       }
       else
