@@ -54,3 +54,6 @@ struct mpioapic {       // I/O APIC table entry
 
 //PAGEBREAK!
 // Blank page.
+
+int syscallcount(int cpu);
+int reset_syscallcount(int cpu);

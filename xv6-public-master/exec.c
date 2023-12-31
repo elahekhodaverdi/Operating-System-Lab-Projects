@@ -6,10 +6,19 @@
 #include "defs.h"
 #include "x86.h"
 #include "elf.h"
+#include "mp.h"
 
 int
 exec(char *path, char **argv)
 {
+  pushcli();
+  for (int i = 0; i < ncpu; i++) {
+    reset_syscallcount(i);
+  }
+  popcli();
+  shared_syscallcount = 0;
+
+
   char *s, *last;
   int i, off;
   uint argc, sz, sp, ustack[3+MAXARG+1];

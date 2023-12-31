@@ -29,3 +29,4 @@
 #define SYS_set_proc_bjf_params 28
 #define SYS_set_system_bjf_params 29
 #define SYS_prioritylock_test 30
+#define SYS_getsyscallcount 31

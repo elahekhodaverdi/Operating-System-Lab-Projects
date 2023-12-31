@@ -6,6 +6,7 @@
 #include "memlayout.h"
 #include "mmu.h"
 #include "proc.h"
+#include "mp.h"
 
 int
 sys_fork(void)
@@ -161,4 +162,21 @@ sys_set_system_bjf_params(void)
 
 void sys_prioritylock_test(void){
     prioritylock_test();
+}
+
+
+
+int sys_getsyscallcount(void)
+{
+  int i, total = 0;
+  for (i = 0; i < ncpu; i++) {
+    int count = syscallcount(i);
+    if(count >= 0) {
+      cprintf("System call count for %d-th core: %d\n", i, count);
+      total += count;
+    }
+  }
+  cprintf("total syscall count: %d\n", total);
+  cprintf("shared syscall count: %d\n", shared_syscallcount);
+  return total;
 }

@@ -127,6 +127,7 @@ extern int sys_print_processes_info(void);
 extern int sys_set_proc_bjf_params(void);
 extern int sys_set_system_bjf_params(void);
 extern int sys_prioritylock_test(void);
+extern int sys_getsyscallcount(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -158,7 +159,8 @@ static int (*syscalls[])(void) = {
 [SYS_print_processes_info] sys_print_processes_info,
 [SYS_set_proc_bjf_params]    sys_set_proc_bjf_params,
 [SYS_set_system_bjf_params]     sys_set_system_bjf_params,
-[SYS_prioritylock_test] sys_prioritylock_test 
+[SYS_prioritylock_test] sys_prioritylock_test,
+[SYS_getsyscallcount] sys_getsyscallcount,
 };
 
 void
@@ -175,4 +177,10 @@ syscall(void)
             curproc->pid, curproc->name, num);
     curproc->tf->eax = -1;
   }
+
+  pushcli();
+  mycpu()->syscallcount++;
+  popcli();
+  shared_syscallcount++;
+
 }

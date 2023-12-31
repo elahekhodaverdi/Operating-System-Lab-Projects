@@ -9,6 +9,9 @@
 #include "sleeplock.h"
 #include "prioritylock.h"
 
+
+int shared_syscallcount = 0;
+
 struct
 {
   int number;

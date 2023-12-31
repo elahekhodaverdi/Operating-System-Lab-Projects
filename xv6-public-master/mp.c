@@ -137,3 +137,19 @@ mpinit(void)
     outb(0x23, inb(0x23) | 1);  // Mask external interrupts.
   }
 }
+
+
+int syscallcount(int cpu)
+{
+  if(cpu < 0 || cpu >= ncpu)
+    return -1;
+  return cpus[cpu].syscallcount;
+}
+
+int reset_syscallcount(int cpu){
+  if(cpu < 0 || cpu >= ncpu)
+    return -1;
+  cpus[cpu].syscallcount = 0;
+
+  return 0;
+}
