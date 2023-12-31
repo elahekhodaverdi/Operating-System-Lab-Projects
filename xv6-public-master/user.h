@@ -32,6 +32,7 @@ int set_proc_bjf_params(int,float,float,float,float);
 int set_system_bjf_params(float,float,float,float);
 void print_processes_info(void);
 void prioritylock_test(void);
+void getsyscallcount(void);
 
 // ulib.c
 int stat(const char*, struct stat*);
