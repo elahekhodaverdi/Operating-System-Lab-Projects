@@ -305,7 +305,7 @@ void exit(void)
   for(int i = 0; i < SHAREDREGIONS; i++) {
     if(curproc->pages[i].shmid != -1 && curproc->pages[i].key != -1) {
       // wrapper that calls detach
-      shmdtWrapper(curproc->pages[i].virtualAddr);
+      close_sharedmemWrapper(curproc->pages[i].virtualAddr);
     }
   }
 

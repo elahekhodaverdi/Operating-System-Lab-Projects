@@ -40,6 +40,6 @@ SYSCALL (print_processes_info)
 SYSCALL (prioritylock_test)
 SYSCALL (getsyscallcount)
 
-SYSCALL(shmget)
-SYSCALL(shmat)
-SYSCALL(shmdt)
+
+SYSCALL(open_sharedmem)
+SYSCALL(close_sharedmem)

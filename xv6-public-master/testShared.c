@@ -45,7 +45,7 @@ int basicSharedTest() {
 		return -1;
 	}
 	// attach to shmid's region
-	char *ptr = (char *)shmat(shmid, (void *)0, 0);
+	char *ptr = (char *)open_sharedmem(shmid, (void *)0, 0);
 	if((int)ptr < 0) {
 		return -1;
 	}
@@ -54,13 +54,13 @@ int basicSharedTest() {
 		ptr[i] = string[i];
 	}
 	// detach
-	int dt = shmdt(ptr);
+	int dt = close_sharedmem(ptr);
 	if(dt < 0) {
 		return -1;
 	}
 
 	// re-attach for verification
-	ptr = (char *)shmat(shmid, (void *)0, 0);
+	ptr = (char *)open_sharedmem(shmid, (void *)0, 0);
 	if((int)ptr < 0) {
 		return -1;
 	}
@@ -72,7 +72,7 @@ int basicSharedTest() {
 		}
 	}
 	// detach
-	dt = shmdt(ptr);
+	dt = close_sharedmem(ptr);
 	if(dt < 0) {
 		return -1;
 	}
@@ -97,7 +97,7 @@ int forkTest() {
 		return -1;
 	}
 	// attach
-	char *ptr = (char *)shmat(shmid, (void *)0, 0);
+	char *ptr = (char *)open_sharedmem(shmid, (void *)0, 0);
 	if((int)ptr < 0) {
 		return -1;
 	}
@@ -133,7 +133,7 @@ int forkTest() {
 			}
 		}
 		// detach
-		int dt = shmdt(ptr);
+		int dt = close_sharedmem(ptr);
 		if(dt < 0) {
 			return -1;
 		}

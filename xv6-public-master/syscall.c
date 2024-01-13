@@ -129,9 +129,8 @@ extern int sys_set_system_bjf_params(void);
 extern int sys_prioritylock_test(void);
 extern int sys_getsyscallcount(void);
 // Declarations for shared memory
-extern int sys_shmget(void);
-extern int sys_shmat(void);
-extern int sys_shmdt(void);
+extern int sys_open_sharedmem(void);
+extern int sys_close_sharedmem(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -166,9 +165,9 @@ static int (*syscalls[])(void) = {
 [SYS_prioritylock_test] sys_prioritylock_test,
 [SYS_getsyscallcount] sys_getsyscallcount,
 
-[SYS_shmget]  sys_shmget,
-[SYS_shmat]  sys_shmat,
-[SYS_shmdt]  sys_shmdt
+
+[SYS_open_sharedmem]  sys_open_sharedmem,
+[SYS_close_sharedmem]  sys_close_sharedmem
 };
 
 void

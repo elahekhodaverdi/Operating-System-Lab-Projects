@@ -32,6 +32,6 @@
 #define SYS_getsyscallcount 31
 
 // System calls for shared memory
-#define SYS_shmget 32
-#define SYS_shmat  33
-#define SYS_shmdt  34
+//#define SYS_shmget 32
+#define SYS_open_sharedmem 32
+#define SYS_close_sharedmem  33

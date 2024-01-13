@@ -35,9 +35,8 @@ void prioritylock_test(void);
 void getsyscallcount(void);
 
 // shared memory
-int shmget(uint, int);
-int shmat(int);
-int shmdt(void*);
+int open_sharedmem(int);
+int close_sharedmem(void*);
 
 // ulib.c
 int stat(const char*, struct stat*);

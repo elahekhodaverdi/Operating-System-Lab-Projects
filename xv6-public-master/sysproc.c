@@ -184,43 +184,29 @@ int sys_getsyscallcount(void)
 
 // Shared memory
 
-extern int shmget(uint, int);
-extern int shmdt(void*);
-extern void * shmat(int);
+extern int close_sharedmem(void*);
+extern void * open_sharedmem(int);
 
-// system call handler for shmget
-int
-sys_shmget(void)
-{
-  int size, shmid;
-  // check for valid arguments
 
-  if(argint(0, &size) < 0)
-    return -1;
-  if(argint(1, &shmid) < 0)
-    return -1;
-  return shmget((uint)size, (int)shmid);
-}
-
-// system call handler for shmdt
-int sys_shmdt(void)
+// system call handler for close_sharedmem
+int sys_close_sharedmem(void)
 {
   int i;
   // check for valid argument
   if(argint(0,&i)<0)
     return 0;
-  return shmdt((void*)i);
+  return close_sharedmem((void*)i);
 }
 
-// system call handler for shmat
+// system call handler for open_sharedmem
 void*
-sys_shmat(void)
+sys_open_sharedmem(void)
 {
   int shmid;
   // check for valid arguments
   if(argint(0, &shmid) < 0)
     return (void*)0;
 
-  return shmat(shmid);
+  return open_sharedmem(shmid);
 }
 

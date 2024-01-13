@@ -213,7 +213,7 @@ void            clearpteu(pde_t *pgdir, char *uva);
 void sharedMemoryInit(void);
 int getShmidIndex(int);
 void mappagesWrapper(struct proc *process, int, int);
-void shmdtWrapper(void *);
+void close_sharedmemWrapper(void *);
 
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))
