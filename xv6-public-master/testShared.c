@@ -2,8 +2,7 @@
 #include "stat.h"
 #include "user.h"
 #include "mmu.h"
-#include "ipc.h"
-#include "shm.h"
+
 #include "memlayout.h"
 
 // test keys

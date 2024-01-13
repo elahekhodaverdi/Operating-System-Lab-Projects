@@ -7,8 +7,6 @@
 #include "proc.h"
 #include "elf.h"
 
-#include "shm.h"
-#include "ipc.h"
 #include "spinlock.h"
 
 extern char data[]; // defined by kernel.ld
@@ -683,11 +681,12 @@ void mappagesWrapper(struct proc *process, int shmIndex, int index)
   for (int i = 0; i < process->pages[index].size; i++)
   {
     uint va = (uint)process->pages[index].virtualAddr;
-    if (mappages(process->pgdir, (void *)(va + (i * PGSIZE)), PGSIZE, (uint)shmTable.allRegions[shmIndex].physicalAddr[i], process->pages[index].perm) < 0)
+    if (mappages(process->pgdir, (void *)(va + (i * PGSIZE)), PGSIZE, (uint)shmTable.allRegions[shmIndex].physicalAddr[i], 06) < 0)
     {
       deallocuvm(process->pgdir, va, (uint)(va + shmTable.allRegions[shmIndex].size));
       return;
     }
+    shmTable.allRegions[shmIndex].shm_nattch += 1;
   }
 }
 
