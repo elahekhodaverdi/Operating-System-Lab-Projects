@@ -5,6 +5,17 @@
 
 #define NCHILD 10
 
+void acuire_user() {
+
+    while ((open("lockfile", O_CREATE  | O_WRONLY)) < 0) ;
+}
+
+void release_user() {
+
+    unlink("lockfile");
+}
+
+
 void test_open_sharedmem() {
   int shmid = 0; 
   void *addr = (void *)open_sharedmem(shmid); 
@@ -38,8 +49,9 @@ void test_sharedmem_increment() {
       printf(1, "fork failed\n");
       return;
     } else if (pid == 0) {
-
+      acuire_user();
       (*(int *)addr)++;
+      release_user();
       exit();
     }
   }
