@@ -394,16 +394,13 @@ int copyout(pde_t *pgdir, uint va, void *p, uint len)
   return 0;
 }
 
-// Shared memory
-
-// structure of single shared memory region
 struct shmRegion
 {
-  uint key, size;                    // key = region key; size = number of pages, e.g. requested size = 4096 (PGSIZE), then size = 1
-  int shmid;                         // shmid
-  void *physicalAddr[SHAREDREGIONS]; // store V2P of pages
-  uint shm_segsz;                    // size of segment in bytes
-  int shm_nattch;                    // current attaches
+  uint key, size;
+  int shmid;                        
+  void *physicalAddr[SHAREDREGIONS];
+  uint shm_segsz;      
+  int shm_nattch;       
 };
 
 struct shmTable
@@ -413,65 +410,44 @@ struct shmTable
 
 } shmTable;
 
-/*
-  Creates a shared memory region with given key,
-  and size depending upon flag provided
-*/
-int shmget(uint size, int index)
+int create_shm(uint size, int index)
 {
-  // as Xv6 has only single user, else lower 9 bits would be considered
-
   acquire(&shmTable.lock);
-
-  // check for requested size
   if (size <= 0)
   {
     release(&shmTable.lock);
     return -1;
   }
-  // calculate no of requested pages, from entered size
   int noOfPages = (size / PGSIZE) + 1;
-  // check if no of pages is more than decided limit
   if (noOfPages > SHAREDREGIONS)
   {
     release(&shmTable.lock);
     return -1;
   }
-  // try to allocate requested size, rounded to page size
   for (int i = 0; i < noOfPages; i++)
   {
     char *newPage = kalloc();
     if (newPage == 0)
     {
-      cprintf("shmget: failed to allocate a page (out of memory)\n");
+      cprintf("Create_shm: failed to allocate a page (out of memory)\n");
       release(&shmTable.lock);
       return -1;
     }
-    // zero out
     memset(newPage, 0, PGSIZE);
     shmTable.allRegions[index].physicalAddr[i] = (void *)V2P(newPage);
   }
-  // mark rest of the fields in structure
   shmTable.allRegions[index].size = noOfPages;
   shmTable.allRegions[index].key = 0;
-
-  // store data for shmid_ds data structure
   shmTable.allRegions[index].shm_segsz = size;
-
-  // store shmid in not yet shared region
   shmTable.allRegions[index].shmid = index;
 
   release(&shmTable.lock);
-  return index; // valid shmid
+  return index;
 }
 
-// finds the least starting address of a segment greater than curr_va which is attached
-// to the virtual address space of the current process. Returns the index from the pages
-// array corresponding to this address if found; -1 otherwise
+
 int getLeastvaidx(void *curr_va, struct proc *process)
 {
-
-  // maximum virtual address available in range
   void *leastva = (void *)(KERNBASE - 1);
 
   int idx = -1;
@@ -479,17 +455,12 @@ int getLeastvaidx(void *curr_va, struct proc *process)
   {
     if (process->pages[i].key != -1 && (uint)process->pages[i].virtualAddr >= (uint)curr_va && (uint)leastva >= (uint)process->pages[i].virtualAddr)
     {
-      // store address if greater than curr_va and smaller than the existing least_va.
       leastva = process->pages[i].virtualAddr;
-
       idx = i;
     }
   }
   return idx;
 }
-
-// detaches the shared memory segment starting at shmaddr from virtual address space of the process
-// returns 0 if successful and -1 in case of a failure
 int close_sharedmem(void *shmaddr)
 {
   acquire(&shmTable.lock);
@@ -526,7 +497,6 @@ int close_sharedmem(void *shmaddr)
     process->pages[index].virtualAddr = (void *)0;
     if (shmTable.allRegions[shmid].shm_nattch > 0)
     {
-      // decrement attaches
       shmTable.allRegions[shmid].shm_nattch -= 1;
     }
     if (shmTable.allRegions[shmid].shm_nattch == 0)
@@ -552,8 +522,6 @@ int close_sharedmem(void *shmaddr)
   }
 }
 
-// attaches shared memory segment identified by shmid to the virtual address shmaddr
-// if provided; otherwise attach at the first fitting address
 void *
 open_sharedmem(int shmid)
 {
@@ -569,7 +537,7 @@ open_sharedmem(int shmid)
   if (index == -1)
   {
     release(&shmTable.lock);
-    index = shmget(2565, shmid);
+    index = create_shm(2565, shmid);
     acquire(&shmTable.lock);
   }
   if (index == -1)
@@ -594,7 +562,6 @@ open_sharedmem(int shmid)
 
   if ((uint)va + shmTable.allRegions[index].size * PGSIZE >= KERNBASE)
   {
-    // size exceeded
     release(&shmTable.lock);
     return (void *)-1;
   }
@@ -641,19 +608,16 @@ open_sharedmem(int shmid)
   else
   {
     release(&shmTable.lock);
-    return (void *)-1; // all page regions exhausted
+    return (void *)-1;
   }
   release(&shmTable.lock);
   return va;
 }
 
-// to initialize shared memory table
 void sharedMemoryInit(void)
 {
-  // initialize shmtable lock
   initlock(&shmTable.lock, "Shared Memory");
   acquire(&shmTable.lock);
-  // initialize all shmtable values
   for (int i = 0; i < SHAREDREGIONS; i++)
   {
     shmTable.allRegions[i].key = shmTable.allRegions[i].shmid = -1;
@@ -668,7 +632,6 @@ void sharedMemoryInit(void)
   release(&shmTable.lock);
 }
 
-// to return shmid index from shmtable
 int getShmidIndex(int shmid)
 {
   if (shmid < 0 || shmid > 64)
@@ -694,7 +657,6 @@ void mappagesWrapper(struct proc *process, int shmIndex, int index)
 
 void close_sharedmemWrapper(void *addr)
 {
-  // call close_sharedmem
   close_sharedmem(addr);
 }
 

@@ -30,8 +30,5 @@
 #define SYS_set_system_bjf_params 29
 #define SYS_prioritylock_test 30
 #define SYS_getsyscallcount 31
-
-// System calls for shared memory
-//#define SYS_shmget 32
 #define SYS_open_sharedmem 32
 #define SYS_close_sharedmem  33

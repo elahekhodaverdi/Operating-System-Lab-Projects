@@ -33,8 +33,6 @@ int set_system_bjf_params(float,float,float,float);
 void print_processes_info(void);
 void prioritylock_test(void);
 void getsyscallcount(void);
-
-// shared memory
 int open_sharedmem(int);
 int close_sharedmem(void*);
 

@@ -61,9 +61,8 @@ struct schedinfo {
 };
 enum procstate { UNUSED, EMBRYO, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 
-// Shared memory
 
-#define SHAREDREGIONS 64 // same as marco in memlayout.h
+#define SHAREDREGIONS 64
 
 typedef struct sharedPages {
   uint key, size;
