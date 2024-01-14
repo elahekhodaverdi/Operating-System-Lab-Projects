@@ -39,7 +39,5 @@ SYSCALL (set_system_bjf_params)
 SYSCALL (print_processes_info)
 SYSCALL (prioritylock_test)
 SYSCALL (getsyscallcount)
-
-
 SYSCALL(open_sharedmem)
 SYSCALL(close_sharedmem)

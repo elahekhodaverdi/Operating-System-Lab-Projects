@@ -182,28 +182,21 @@ int sys_getsyscallcount(void)
 }
 
 
-// Shared memory
-
 extern int close_sharedmem(void*);
 extern void * open_sharedmem(int);
 
-
-// system call handler for close_sharedmem
 int sys_close_sharedmem(void)
 {
   int i;
-  // check for valid argument
   if(argint(0,&i)<0)
     return 0;
   return close_sharedmem((void*)i);
 }
 
-// system call handler for open_sharedmem
 void*
 sys_open_sharedmem(void)
 {
   int shmid;
-  // check for valid arguments
   if(argint(0, &shmid) < 0)
     return (void*)0;
 

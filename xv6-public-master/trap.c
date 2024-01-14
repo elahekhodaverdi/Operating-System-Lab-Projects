@@ -80,10 +80,6 @@ trap(struct trapframe *tf)
     lapiceoi();
     break;
 
-      /*
-    Shared memory:
-      handled, while writing into a region with read-only access
-  */
   case 14:
     if(strncmp(myproc()->name, "testShared", strlen(myproc()->name)) != 0) {
       if(myproc() == 0 || (tf->cs&3) == 0){

@@ -1,4 +1,3 @@
- 
 #include "types.h"
 #include "stat.h"
 #include "user.h"
@@ -57,7 +56,5 @@ int main(void) {
   // test_open_sharedmem();
   // test_close_sharedmem();
   test_sharedmem_increment();
-
-
   exit();
 }
