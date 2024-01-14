@@ -192,7 +192,7 @@ UPROGS=\
 	_test_prioritylock\
 	_foo\
 	_testsyscall\
-	_testShared\
+	_test_shared_memory\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)

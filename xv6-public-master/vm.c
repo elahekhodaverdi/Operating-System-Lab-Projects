@@ -501,6 +501,7 @@ int close_sharedmem(void *shmaddr)
     }
     if (shmTable.allRegions[shmid].shm_nattch == 0)
     {
+      
       for (int i = 0; i < shmTable.allRegions[index].size; i++)
       {
         char *addr = (char *)P2V(shmTable.allRegions[index].physicalAddr[i]);
@@ -511,6 +512,7 @@ int close_sharedmem(void *shmaddr)
       shmTable.allRegions[index].key = shmTable.allRegions[index].shmid = -1;
       shmTable.allRegions[index].shm_nattch = 0;
       shmTable.allRegions[index].shm_segsz = 0;
+      cprintf("number of refrences is 0, shared memory is freed.\n");
     }
     release(&shmTable.lock);
     return 0;
