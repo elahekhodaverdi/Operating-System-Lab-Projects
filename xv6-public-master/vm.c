@@ -418,25 +418,25 @@ int create_shm(uint size, int index)
     release(&shmTable.lock);
     return -1;
   }
-  int noOfPages = (size / PGSIZE) + 1;
-  if (noOfPages > SHAREDREGIONS)
+  int num_of_pages = (size / PGSIZE) + 1;
+  if (num_of_pages > SHAREDREGIONS)
   {
     release(&shmTable.lock);
     return -1;
   }
-  for (int i = 0; i < noOfPages; i++)
+  for (int i = 0; i < num_of_pages; i++)
   {
-    char *newPage = kalloc();
-    if (newPage == 0)
+    char *new_page = kalloc();
+    if (new_page == 0)
     {
       cprintf("Create_shm: failed to allocate a page (out of memory)\n");
       release(&shmTable.lock);
       return -1;
     }
-    memset(newPage, 0, PGSIZE);
-    shmTable.allRegions[index].physicalAddr[i] = (void *)V2P(newPage);
+    memset(new_page, 0, PGSIZE);
+    shmTable.allRegions[index].physicalAddr[i] = (void *)V2P(new_page);
   }
-  shmTable.allRegions[index].size = noOfPages;
+  shmTable.allRegions[index].size = num_of_pages;
   shmTable.allRegions[index].key = 0;
   shmTable.allRegions[index].shm_segsz = size;
   shmTable.allRegions[index].shmid = index;
