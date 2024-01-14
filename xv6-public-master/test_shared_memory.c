@@ -55,12 +55,9 @@ void test_sharedmem_increment() {
       exit();
     }
   }
-
- 
   for (int i = 0; i < NCHILD; i++) {
     wait();
   }
-
   printf(1, "Final value in shared memory: %d\n", *(int *)addr);
 }
 
