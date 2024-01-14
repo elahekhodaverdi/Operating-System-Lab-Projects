@@ -408,7 +408,6 @@ struct shmRegion
 
 struct shmTable
 {
-
   struct spinlock lock;
   struct shmRegion allRegions[SHAREDREGIONS];
 
@@ -569,10 +568,13 @@ open_sharedmem(int shmid)
   index = shmTable.allRegions[shmid].shmid;
   if (index == -1)
   {
+    release(&shmTable.lock);
     index = shmget(2565, shmid);
+    acquire(&shmTable.lock);
   }
   if (index == -1)
   {
+    release(&shmTable.lock);
     return (void *)-1;
   }
   for (int i = 0; i < SHAREDREGIONS; i++)
