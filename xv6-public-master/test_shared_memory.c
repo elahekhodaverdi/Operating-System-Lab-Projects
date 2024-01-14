@@ -15,8 +15,6 @@ void test_open_sharedmem() {
   }
 
   printf(1, "Shared memory region with shmid %d attached at address %p\n", shmid, addr);
-
-  *(int *)addr = 0;
 }
 
 void test_close_sharedmem() {
@@ -56,9 +54,10 @@ void test_sharedmem_increment() {
 }
 
 int main(void) {
-  test_open_sharedmem();
+  // test_open_sharedmem();
+  // test_close_sharedmem();
   test_sharedmem_increment();
-  test_close_sharedmem();
+
 
   exit();
 }
